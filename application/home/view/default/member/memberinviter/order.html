@@ -1,0 +1,67 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+
+
+
+
+
+<form method="post" target="_self">
+    <table class="dsm-search-table">
+        <tr>
+            <th>订单号</th>
+            <td class="w160"><input type="text" class="text w150" name="orderinviter_order_sn" value="{$Request.param.orderinviter_order_sn}"></td>
+            <td class="w70 tc">
+                <label class="submit-border">
+                    <input type="submit" class="submit" value="{$Think.lang.ds_search}"/>
+                </label>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="dsm-default-table">
+    <thead>
+        <tr>
+            <th class="w40">佣金</th>
+            <th class="w80 tl">订单号</th>
+            <th class="w150 tl">备注</th>
+            <th class="w40">是否有效</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="orderinviter_list"}
+        {foreach name="orderinviter_list" item="v" }
+        <tr class="bd-line">
+            <td class="tl">￥{$v.orderinviter_money}</td>
+            <td class="tl">{$v.orderinviter_order_sn}</td>
+            <td class="tl">{$v.orderinviter_remark}</td>
+            <td class="tl">{if $v.orderinviter_valid}是{else/}否{/if}</td>
+        </tr>
+        {/foreach}
+        {else/}
+        <tr>
+            <td colspan="20" class="norecord"><div class="warning-option"><i>&nbsp;</i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="orderinviter_list"}
+        <tr>
+            <td colspan="20"><div class="pagination">{$show_page}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+
+<script type="text/javascript">
+$(function(){
+    $('#query_start_date').datepicker({dateFormat: 'yy-mm-dd'});
+    $('#query_end_date').datepicker({dateFormat: 'yy-mm-dd'});
+});
+</script>
+
+
+
+
+{/block}

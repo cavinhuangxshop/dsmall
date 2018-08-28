@@ -1,0 +1,89 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<link href="{$Think.HOME_SITE_ROOT}/css/point.css" rel="stylesheet" type="text/css">
+<div class="dsp-container">
+  <div class="dsp-base-layout">
+    <div class="dsp-member-left">
+      {include file="default/member/pointprod/pointshop_minfo" /}
+    </div>
+    <div class="dsp-member-right">
+      <div class="dsp-grade">
+        <div class="title">
+          <h3>我的升级进度</h3>
+        </div>
+        <div class="dsp-gradeall-bar">
+          {if $membergrade_arr}
+          {foreach name="membergrade_arr" item="v"}
+          <div class="itemlevel exp-lv{$v.level}" >
+            {present name="v.is_cur"}
+            <div class="bar" title='{if $v.is_cur}经验值：{$member_info.member_exppoints}{/if}'><i></i> <span class="arrow"></span>
+              <div class="tips">
+                <p class="p1"> 我的当前等级： <strong>{$v.level_name}</strong> 当前经验值： <em>{$member_info.member_exppoints}</em> </p>
+                <p class="p2">
+                  <?php if ($key >= count($membergrade_arr)-1){?>
+                  已达到最高会员级别，继续加油保持这份荣誉哦！
+                  <?php } else {?>
+                  在有效期前再累积
+                  <strong>{php}echo $membergrade_arr[$key+1]['exppoints']-$member_info['member_exppoints'];{/php}</strong>
+                  经验值即可升级
+                  <em>{$membergrade_arr[$key+1]['level_name']}</em>
+                  <?php } ?>
+                </p>
+              </div>
+            </div>
+          {/present}
+          <div class="gradelabel">
+            <strong>{$v.level_name}</strong>
+            <i>({$v.exppoints})</i>
+          </div>
+          </div>
+        {/foreach}
+        {else /}
+        暂无等级
+        {/if}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dsp-grade-layout mt20">
+    <div class="title">
+      <h3>经验值结构</h3>
+    </div>
+    <dl>
+      <dt><i class="fa fa-calculator"></i>
+        <p>如何计算经验值</p>
+      </dt>
+      <dd>
+        {if $ruleexplain_arr}
+        <ul>
+          {foreach name="ruleexplain_arr" item="v"}
+          <li>{$v}</li>
+          {/foreach}
+        </ul>
+       {/if}
+      </dd>
+    </dl>
+  </div>
+  <div class="dsp-grade-layout">
+    <div class="title">
+      <h3>有效购物金额</h3>
+    </div>
+    <dl>
+      <dt><i class="fa fa-random"></i>
+        <p>有效范围</p>
+      </dt>
+      <dd>
+        {if $ruleexplain_arr.exp_order}
+        <ul>
+          <li>实物交易订单的在
+            <strong>【确认完成】</strong>后，该笔订单金额计入有效购物金额；在您收货后，请到
+            <strong>【实物交易订单】</strong>中，点击<strong>【确认收货】</strong>，经验值会更快地发放；</li>
+          <li>虚拟兑换订单的在<strong>【已完成】</strong>后，该笔订单金额计入有效购物金额；</li>
+        </ul>
+        {/if}
+      </dd>
+    </dl>
+  </div>
+</div>
+
+{/block}

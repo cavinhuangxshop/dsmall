@@ -1,0 +1,167 @@
+{extend name="default/base/base_joinin" /}
+{block name="joinin_main"}
+
+
+<div class="join_banner">
+    <div class="bd">
+        <ul>
+            {notempty name="pic_list"}
+            {php}$pic_n = 0;{/php}
+            {foreach name="pic_list" item="val" key="key" }
+            {if !empty($val)}
+            {php}$pic_n++;{/php}
+            <li style="background-image: url({$Think.UPLOAD_SITE_URL}/admin/Storejion/{$val})" ></li>
+            {/if}
+            {/foreach}
+            {/notempty}
+        </ul>
+    </div>
+    {gt name='pic_n' value='1'}
+    <div class="hd">
+        <ul>
+            {for start='0' end="$pic_n"}
+            <li><i></i></li>
+            {/for}
+        </ul>
+    </div>
+    <a class="prev" href="javascript:void(0)"></a>
+    <a class="next" href="javascript:void(0)"></a>
+    <script src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+    <script>
+        jQuery(".join_banner").slide({mainCell: ".bd ul", autoPlay: true, interTime: 4000});
+    </script>
+    {/gt}
+</div>
+
+<div class="indextip">
+    <div class="container"> <span class="title"><i class="fa fa-volume-up"></i>
+    <h3>贴心提示</h3>
+    </span>
+        <span class="content">{$show_txt}</span>
+    </div>
+</div>
+
+<div class="index-notice-box">
+    <ul class="index-notice clearfix">
+        <li>
+            <h1>入驻申请</h1>
+            <p>未填写入驻申请资料时进行入驻资料填写</p>
+            <a target="_blank" href="{if $Think.session.is_login eq '1'}{:url('Sellerjoinin/step0')}{else/}javascript:login_dialog();{/if}" class="index-notice-btn setUpShop">我要入驻</a>
+        </li>
+        <li>
+            <h1>入驻进度</h1>
+            <p>店铺还未开通时了解店铺开通的最新状况</p>
+            <a href="{if $Think.session.is_login eq '1'}{:url('Sellerjoinin/index')}{else/}javascript:login_dialog();{/if}" target="_blank" class="index-notice-btn merchantsSettled">查看入驻进度</a>
+        </li>
+        <li class="index-notice-last"><h1>信息公告</h1>
+            <ul class="index-list">
+                {foreach $index_articles as $i_a}
+                <li>
+                    <a target="_blank" title="{$i_a.article_title}" href="{if $i_a.article_url !=''}{$i_a.article_url}{else /}{:url('Article/show',['article_id'=>$i_a.article_id])}{/if}">
+                        {$i_a.article_title}
+                    </a>
+                    <em>重要</em>
+                </li>
+                {/foreach}
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<div class="con-floor-3 tenants-con-floor-3">
+    <div class="con-topic">入驻流程</div>
+    <div class="w1190">
+        <div class="con-floor-3-single">
+            <i class="fa fa-edit"></i>
+            <div>
+                <h2>提交入驻资料</h2>
+                <em>约2小时</em>
+                <ul>
+                    <li>填写企业信息</li>
+                    <li>选择店铺类型/类目</li>
+                    <li>填写品牌信息/资质信息</li>
+                    <li>店铺名称</li>
+                    <li>确认合同/提交审核</li>
+                </ul>
+            </div>
+        </div>
+        <i class="con-floor-3-arrow"></i>
+        <div class="con-floor-3-single">
+            <i class="fa fa-clock-o"></i>
+            <div>
+                <h2>商家等待审核</h2>
+                <em>3-6工作日</em>
+                <ul>
+                    <li>资质审核</li>
+                    <li>品牌审核</li>
+                </ul>
+            </div>
+        </div>
+        <i class="con-floor-3-arrow"></i>
+        <div class="con-floor-3-single">
+            <i class="fa fa-rmb"></i>
+            <div>
+                <h2>开通缴费</h2>
+                <em>约10分钟</em>
+                <ul>
+                    <li>实名认证/一致性校验</li>
+                    <li>签署代扣协议</li>
+                    <li>缴纳费用</li>
+                </ul>
+            </div>
+        </div>
+        <i class="con-floor-3-arrow"></i>
+        <div class="con-floor-3-single">
+            <i class="fa fa-handshake-o"></i>
+            <div>
+                <h2>店铺上线</h2>
+                <em>约20分钟</em>
+                <ul>
+                    <li>发布商品</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main mt30">
+    <h2 class="index-title">入驻指南</h2>
+    <div class="joinin-info">
+        <ul class="tabs-nav">
+            {notempty name="help_list"}
+            {php}$i = 0;{/php}
+            {foreach name="help_list" item="val" key="key" }
+            {php}$i++;{/php}
+            <li class="{if $i==1}tabs-selected{/if}">
+                <h3>{$val.help_title}</h3>
+            </li>
+            {/foreach}
+            {/notempty}
+        </ul>
+        {notempty name="help_list"}
+        {php}$i = 0;{/php}
+        {foreach name="help_list" item="val" key="key" }
+        {php}$i++;{/php}
+        <div class="tabs-panel {if $i!=1}tabs-hide{/if}">{$val.help_info}</div>
+        {/foreach}
+        {/notempty}
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $(".tabs-nav > li > h3").bind('mouseover', (function(e) {
+    	if (e.target == this) {
+    		var tabs = $(this).parent().parent().children("li");
+    		var panels = $(this).parent().parent().parent().children(".tabs-panel");
+    		var index = $.inArray(this, $(this).parent().parent().find("h3"));
+    		if (panels.eq(index)[0]) {
+    			tabs.removeClass("tabs-selected").eq(index).addClass("tabs-selected");
+    			panels.addClass("tabs-hide").eq(index).removeClass("tabs-hide");
+    		}
+    	}
+    }));
+});
+</script>
+
+
+{/block}

@@ -1,0 +1,124 @@
+{extend name="default/base/base_joinin" /}
+{block name="joinin_main"}
+
+<div class="breadcrumb"><span class="fa fa-home"></span><span><a href="{:url('Index/index')}">首页</a></span> <span class="arrow">></span> <span>商家入驻申请</span> </div>
+<div class="main">
+    <div class="sidebar">
+        <div class="title">
+            <h3>商家入驻申请</h3>
+        </div>
+        <div class="content">
+            <dl>
+                <dt class="{if $sub_step == 'step0'}current{/if}"> <i class="hide"></i>签订入驻协议</dt>
+            </dl>
+            <dl show_id="0">
+                <dt onclick="show_list('0');" style="cursor: pointer;"> <i class="show"></i>提交申请</dt>
+                <dd>
+                    <ul>
+                        <li class="{if $sub_step == 'step1'}current{/if}"><i></i>店铺资质信息</li>
+                        <li class="{if $sub_step == 'step2'}current{/if}"><i></i>财务资质信息</li>
+                        <li class="{if $sub_step == 'step3'}current{/if}"><i></i>店铺经营信息</li>
+                    </ul>
+                </dd>
+            </dl>
+            <dl>
+                <dt class="{if $sub_step == 'pay'}current{/if}"> <i class="hide"></i>合同签订及缴费</dt>
+            </dl>
+            <dl>
+                <dt> <i class="hide"></i>店铺开通</dt>
+            </dl>
+        </div>
+        <div class="title">
+            <h3>平台联系方式</h3>
+        </div>
+        <div class="content">
+            <ul>
+                <li>电话：{$Think.config.site_phone}</li>
+                <li>邮箱：{$Think.config.site_email}</li>
+            </ul> 
+        </div>
+    </div>
+    <div class="right-layout">
+        <div class="joinin-step">
+            <ul>
+                <li class="step1 {if $sub_step >= 'step0'}current{/if}{if $sub_step=='pay'}current{/if}"><span>签订入驻协议</span></li>
+                <li class="{if $sub_step >= 'step1'}current{/if}{if $sub_step=='pay'}current{/if}"><span>店铺资质信息</span></li>
+                <li class="{if $sub_step >= 'step2'}current{/if}{if $sub_step=='pay'}current{/if}"><span>财务资质信息</span></li>
+                <li class="{if $sub_step >= 'step3'}current{/if}{if $sub_step=='pay'}current{/if}"><span>店铺经营信息</span></li>
+                <li class="{if $sub_step >= 'step4'}current{/if}{if $sub_step=='pay'}current{/if}"><span>合同签订及缴费</span></li>
+                <li class="step6"><span>店铺开通</span></li>
+            </ul>
+        </div>
+        <div class="joinin-concrete">
+
+
+
+
+
+
+
+
+
+
+
+            
+            
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#btn_apply_agreement_c2c_next').on('click', function() {
+        if($('#input_apply_agreement').prop('checked')) {
+            window.location.href = HOMESITEURL+"/Sellerjoininc2c/step1";
+        } else {
+            alert('请阅读并同意协议');
+        }
+    });
+    $('#btn_apply_agreement_next').on('click', function() {
+        if($('#input_apply_agreement').prop('checked')) {
+            window.location.href = HOMESITEURL+"/Sellerjoinin/step1.html";
+        } else {
+            alert('请阅读并同意协议');
+        }
+    });
+});
+</script>
+
+<div class="store-joinin-apply"> 
+  <!-- 协议 -->
+  <div id="apply_agreement" class="apply-agreement">
+    <h3>入驻协议</h3>
+    <div class="apply-agreement-content">
+        {$agreement}
+    </div>
+    <div class="apple-agreement">
+      <input id="input_apply_agreement" name="input_apply_agreement" type="checkbox" checked />
+      <label for="input_apply_agreement">我已阅读并同意以上协议</label>
+    </div>
+    <div class="bottom">
+		<a id="btn_apply_agreement_c2c_next" href="javascript:;" class="btn">个人入驻</a>
+		<a id="btn_apply_agreement_next" href="javascript:;" class="btn">企业入驻</a>
+	</div>
+  </div>
+</div>
+
+            
+            
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+{/block}

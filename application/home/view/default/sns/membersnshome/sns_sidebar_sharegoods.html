@@ -1,0 +1,20 @@
+<div class="title">
+  <h4>
+    {if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_of_other}{if $Request.get.type=='like'}{$Think.lang.sns_like}{else/}{$Think.lang.ds_snsshare}{/if}
+  </h4>
+  <span><a href="{$Think.HOME_SITE_URL}/Membersnshome/shareglist.html?type={if $Request.get.type=='like'}like{else/}share{/if}&mid={$sharegoods_info.sharegoods_memberid}">{$Think.lang.ds_more}</a></span></div>
+<div class="side-goodslist">
+  <ul>
+     {notempty name="sharegoods_list"}
+    {foreach name="sharegoods_list" item="val" }
+    <li>
+      <div class="goods-pic"><span class="thumb size75"><i></i><a href="{$Think.HOME_SITE_URL}/Membersnshome/goodsinfo.html?mid={$val.sharegoods_memberid}{if $Request.get.type=='like'}&type=like{/if}&id={$val.sharegoods_id}" title="{$val.snsgoods_goodsname}"> <img src="{:goods_cthumb($val['snsgoods_goodsimage'], 240,$val['snsgoods_storeid'])}"/></a></span><em class="price">{$Think.lang.currency}{$val.snsgoods_goodsprice}</em></div>
+    </li>
+    {/foreach}
+    {else/}
+    <li>
+      <div><span>{$Think.lang.sns_not_found_other_goods}</span></div>
+    </li>
+    {/notempty}
+  </ul>
+</div>

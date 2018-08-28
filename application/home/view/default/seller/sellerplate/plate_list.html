@@ -1,0 +1,85 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_btn"}
+
+<a href="{:url('Sellerplate/plate_add')}" class="dssc-btn dssc-btn-green" title="添加关联版式">添加关联版式</a>
+
+{/block}
+{block name="seller_main"}
+<div class="alert mt15 mb5">
+    <strong>操作提示：</strong>
+    <ul>
+        <li>1、关联版式可以把预设内容插入到商品描述的顶部或者底部，方便商家对商品描述批量添加或修改。</li>
+    </ul>
+</div>
+<form method="get">
+    <table class="search-form">
+        <tr>
+            <td>&nbsp;</td>
+
+            <th>版式位置</th>
+            <td class="w80">
+                <select name="p_position">
+                    <option>请选择</option>
+                    {foreach name="position" item="val" key="key" }
+                    <option value="{$key}" {if condition="$Request.param.p_position eq $key"}selected="selected"{/if}>{$val}</option>
+                    {/foreach}
+                </select>
+            </td><th>版式名称</th>
+            <td class="w160"><input type="text" class="text w150" name="p_name" value="{$Request.param.p_name}"/></td>
+            <td class="w70 tc"><label class="submit-border"><input type="submit" class="submit" value="{$Think.lang.ds_search}" /></label></td>
+        </tr>
+    </table>
+</form>
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w30"></th>
+            <th class="tl">版式名称</th>
+            <th class="w200">版式位置</th>
+            <th class="w110">{$Think.lang.ds_handle}</th>
+        </tr>
+        {notempty name="plate_list"}
+        <tr>
+            <td class="tc"><input type="checkbox" id="all" class="checkall"/></td>
+            <td colspan="10"><label for="all" >{$Think.lang.ds_select_all}</label>
+                <a href="javascript:void(0);" ds_type="batchbutton" uri="{:url('Sellerplate/drop_plate')}" name="p_id" confirm="{$Think.lang.ds_ensure_del}" class="dssc-btn-mini"><i class="fa fa-trash-o"></i>{$Think.lang.ds_del}</a>
+            </td>
+        </tr>
+        {/notempty}
+    </thead>
+    <tbody>
+        {notempty name="plate_list"}
+        {foreach name="plate_list" item="val" }
+        <tr class="bd-line">
+            <td class="tc"><input type="checkbox" class="checkitem tc" value="{$val.storeplate_id}"/></td>
+            <td class="tl">{$val.storeplate_name}</td>
+            <td>{$position[$val['storeplate_position']]}</td>
+            <td class="nscs-table-handle">
+                <span><a href="{:url('Sellerplate/plate_edit',['p_id'=>$val.storeplate_id])}" class="btn-blue"><i class="fa fa-pencil-square"></i><p>{$Think.lang.ds_edit}</p></a></span>
+                <span><a href="javascript:void(0)" onclick="ajax_get_confirm('{$Think.lang.ds_ensure_del}', '{:url('Sellerplate/drop_plate',['p_id'=>$val.storeplate_id])}');" class="btn-red"><i class="fa fa-trash-o"></i><p>{$Think.lang.ds_del}</p></a></span>
+            </td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr>
+            <td colspan="20" class="norecord"><div class="warning-option"><i class="fa fa-warning"></i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="plate_list"}
+        <tr>
+            <th class="tc"><input type="checkbox" id="all" class="checkall"/></th>
+            <th colspan="10"><label for="all" >{$Think.lang.ds_select_all}</label>
+                <a href="javascript:void(0);" ds_type="batchbutton" uri="{:url('Sellerplate/drop_plate')}" name="p_id" confirm="{$Think.lang.ds_ensure_del}" class="dssc-btn-mini"><i class="fa fa-trash-o"></i>{$Think.lang.ds_del}</a>
+            </th>
+        </tr>
+        <tr>
+            <td colspan="20"><div class="pagination">{$show_page}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+
+{/block}

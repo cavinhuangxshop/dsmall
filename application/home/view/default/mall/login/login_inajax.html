@@ -1,0 +1,221 @@
+<div class="quick-login">
+    <div class="mt">
+        <ul>
+            <li class="on">普通登录</li>
+            {if $Think.config.sms_login == 1}
+            <li>动态验证码登录</li>
+            {/if}
+        </ul>
+    </div>
+    <div class="mc">
+        <form id="login_normal_inajax" action="{:url('Login/login',['inajax'=>'1'])}" method="post" class="bg" >
+            <dl>
+                <dt></dt>
+                <dd>
+                    <i class="fa fa-user-o icon"></i>
+                    <input type="text" class="text"  name="member_name" id="member_name" value="" placeholder="用户名/邮箱/手机" >
+                </dd>
+            </dl>
+            <dl>
+                <dt></dt>
+                <dd>
+                    <i class="fa fa-unlock-alt icon"></i>
+                    <input type="password" class="text" name="member_password" id="member_password" value="" placeholder="密码">
+                </dd>
+            </dl>
+            {if $Think.config.captcha_status_login == '1'}
+            <dl>
+                <dt></dt>
+                <dd class="clearfix">
+                    <i class="fa fa-info icon"></i>
+                    <input type="text" name="captcha_normal" class="text fl" style="width:96px;" id="captcha_normal" maxlength="4" size="10" />
+                    <img class="fl ml10" height="38" src="{:url('Seccode/makecode')}" title="{$Think.lang.login_index_change_checkcode}" name="codeimage" border="0" id="codeimage" onclick="this.src = '{:url('Seccode/makecode')}'">
+                </dd>
+            </dl>
+            {/if}
+            <ul>
+                <li><a href="{:url('Login/register')}" class="register">{$Think.lang.quick_login_register}</a><a href="{:url('Login/forget_password')}" class="forget">{$Think.lang.quick_login_forget}</a></li>
+            </ul>
+            <div class="enter">
+                <input type="submit" class="submit" value="立即登录" name="Submit">
+            </div>
+            <input type="hidden" value="{$Request.param.ref_url}" name="ref_url">
+        </form>
+        <form id="login_mobile_inajax" style="display:none" action="{:url('Connectsms/login',['inajax'=>'1'])}" method="post" class="bg" >
+            <dl>
+                <dt></dt>
+                <dd>
+                    <i class="fa fa-user-o icon"></i>
+                    <input type="text" class="text"  name="sms_mobile" id="sms_mobile" value="" placeholder="已注册的手机号码" >
+                </dd>
+            </dl>
+            <dl>
+                <dt></dt>
+                <dd class="mobile">
+                    <i class="fa fa-unlock-alt icon"></i>
+                    <input type="password" class="text sms_captcha" name="sms_captcha" id="sms_captcha" value="" placeholder="手机验证码">
+                    <a href="javascript:void(0)" class="send_code" id="btn_sms_captcha" ds_type="2">获取验证码</a>
+                </dd>
+            </dl>
+            {if $Think.config.captcha_status_login == '1'}
+            <dl>
+                <dt></dt>
+                <dd class="clearfix">
+                    <i class="fa fa-info icon"></i>
+                    <input type="text" name="captcha_mobile" class="text fl" style="width:96px;" id="captcha_mobile" maxlength="4" size="10" />
+                    <img class="fl ml10" height="38" src="{:url('Seccode/makecode')}" title="{$Think.lang.login_index_change_checkcode}" name="codeimage" border="0" id="codeimage" onclick="this.src = '{:url('Seccode/makecode')}'">
+                </dd>
+            </dl>
+            {/if}
+            <ul>
+                <li><a href="{:url('Login/register')}" class="register">{$Think.lang.quick_login_register}</a><a href="{:url('Login/forget_password')}" class="forget">{$Think.lang.quick_login_forget}</a></li>
+            </ul>
+            <div class="enter">
+                <input type="submit" class="submit" value="立即登录" name="Submit">
+            </div>
+            <input type="hidden" value="{$Request.param.ref_url}" name="ref_url">
+        </form>
+        {if $Think.config.qq_isuse =='1' || $Think.config.sina_isuse =='1' || $Think.config.weixin_isuse =='1'}
+        <div class="partner-login clearfix">
+            <h3>你可以用合作伙伴账号登陆</h3>
+            <p>
+                {if $Think.config.qq_isuse == '1'}
+                <a class="login_ico ico_qq" href="{:url('Api/oa_qq')}"></a>
+                {/if}
+                {if $Think.config.sina_isuse == '1'}
+                <a class="login_ico ico_weibo" href="{:url('Api/oa_sina')}"></a>
+                {/if}
+                {if $Think.config.weixin_isuse == '1'}
+                <a class="login_ico ico_weixin" onclick="ajax_form('weixin_form', '微信账号登录', '{:url('Connectwx/index')}', 360);" title="微信账号登录"></a>
+                {/if}
+            </p>
+        </div>
+        {/if}
+    </div>
+</div>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/connect_sms.js"></script> 
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.validate.min.js"></script>
+<script>
+            $(document).ready(function() {
+                $(".quick-login .mt li").click(function(){
+                    var index = $(this).index();
+                    $(this).parent().parent().next().find("form").hide().eq(index).show();
+                    $(this).addClass("on").siblings().removeClass("on");
+                });
+                $("#login_normal_inajax").validate({
+                    errorPlacement: function(error, element) {
+                        var error_dd = element.parent('dd'), error_dt = element.parent().parent().find('dt');
+                        error_dt.append(error);
+                        error_dd.addClass('error');
+                    },
+                    onkeyup: false,
+                    submitHandler: function(form) {
+                        ajaxpost('login_normal_inajax', '', '', 'error');
+                    },
+                    rules: {
+                        member_name: "required",
+                        member_password: "required",
+                        {if $Think.config.captcha_status_login == '1'}
+                        captcha_normal: {
+                            required: true,
+                            remote: {
+                                url: "{:url('Seccode/check',['reset'=>'false'])}",
+                                type: 'get',
+                                data: {
+                                    captcha: function() {
+                                        return $('#captcha_normal').val();
+                                    }
+                                },
+                                complete: function(data) {
+                                    if (data.responseText == 'false') {
+                                        document.getElementById('codeimage').src = "{:url('Seccode/makecode')}";
+                                    }
+                                }
+                            }
+                        }
+                        {/if}
+                    },
+                    messages: {
+                        member_name: '<i class="fa fa-info-circle"></i>用户名为必填',
+                        member_password: '<i class="fa fa-info-circle"></i>密码为必填',
+                        {if $Think.config.captcha_status_login == '1'}
+                        captcha_normal: {
+                            required: '<i class="fa fa-info-circle"></i>验证码为必填',
+                            remote: '<i class="fa fa-info-circle"></i>验证码错误'
+                        }
+                        {/if}
+                    }
+                });
+            });
+</script>
+
+{if $Think.config.sms_login == 1}
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/connect_sms.js"></script>
+<script>
+            $(function () {
+                $("#login_mobile_inajax").validate({
+                    errorPlacement: function (error, element) {
+                        var error_dd = element.parent('dd'), error_dt = element.parent().parent().find('dt');
+                        error_dt.append(error);
+                        error_dd.addClass('error');
+                    },
+                    success: function (label) {
+                        label.parents('.text-area:first').removeClass('error').find('label').remove();
+                    },
+                    submitHandler:function(form){
+                        ajaxpost('login_mobile_inajax', '', '', 'onerror');
+                    },
+                    onkeyup: false,
+                    rules: {
+                        sms_mobile: {
+                            required: true,
+                            number:true,
+                            rangelength:[11,11]
+                        },
+                        sms_captcha: {
+                            required: true,
+                            rangelength:[6,6]
+                        }
+                        {if $Think.config.captcha_status_login == '1'},
+                        captcha_mobile: {
+                            required: true,
+                            remote: {
+                                url: "{:url('Seccode/check',['reset'=>'false'])}",
+                                type: 'get',
+                                data: {
+                                    captcha: function () {
+                                        return $('#captcha_mobile').val();
+                                    }
+                                },
+                                complete: function (data) {
+                                    if (data.responseText == 'false') {
+                                        document.getElementById('sms_codeimage').src = "{:url('Seccode/makecode')}";
+                                    }
+                                }
+                            }
+                        }
+                        {/if}
+                    },
+                    messages: {
+                        sms_mobile: {
+                            required: '<i class="fa fa-info-circle"></i>请输入正确的手机号',
+                            number: '<i class="fa fa-info-circle"></i>请输入正确的手机号',
+                            rangelength:'<i class="fa fa-info-circle"></i>请输入正确的手机号'
+                        },
+                        sms_captcha: {
+                            required: '<i class="fa fa-info-circle"></i>请输入六位短信动态码',
+                            rangelength: '<i class="fa fa-info-circle"></i>请输入六位短信动态码'
+                        }
+                        {if $Think.config.captcha_status_login == '1'},
+                        captcha_mobile: {
+                            required: '<i class="fa fa-info-circle"></i>验证码为必填',
+                            remote: '<i class="fa fa-info-circle"></i>验证码错误'
+                        }
+                        {/if}
+                    }
+                });
+            });
+</script>
+{/if}
+
+

@@ -1,0 +1,324 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+
+
+
+
+<div class="dsm-oredr-show">
+  <div class="dsm-order-info">
+    <div class="dsm-order-details">
+      <div class="title">虚拟订单信息</div>
+      <div class="content">
+        <dl>
+          <dt>接收手机：</dt>
+          <dd>
+            {$order_info.buyer_phone}
+            {if $order_info.order_state == ORDER_STATE_PAY}
+              <a href="javascript:void(0);" class="dsm-btn-mini dsm-btn-orange" dialog_id="vr_code_resend" dialog_title="发送电子兑换码" dialog_width="480" ds_type="dialog" uri="{:url('Membervrorder/resend',['buyer_phone'=>$order_info.buyer_phone,'order_id'=>$order_info.order_id])}"><i class="fa fa-mobile-phone"></i>重新发送</a>
+             {/if}
+          </dd>
+        </dl>
+        <dl class="line">
+          <dt>虚拟单号：</dt>
+          <dd>
+            {$order_info.order_sn}
+              <a href="javascript:void(0);">更多<i class="fa fa-angle-down"></i>
+            <div class="more"><span class="arrow"></span>
+              <ul>
+                <li>支付方式：<span>{:get_order_payment_name($order_info.payment_code)}</span></li>
+                <li>下单时间：<span>{:date('Y-m-d H:i:s',$order_info.add_time)}</span></li>
+                {notempty name="order_info.payment_time"}
+                  <li>付款时间：<span>{:date('Y-m-d H:i:s',$order_info.payment_time)}</span></li>
+                 {/notempty}
+              </ul>
+            </div>
+            </a></dd>
+        </dl>
+        <dl class="line">
+          <dt>买家留言：</dt>
+          <dd>{$order_info.buyer_msg}</dd>
+        </dl>
+        <dl class="line">
+          <dt>商&#12288;&#12288;家：</dt>
+          <dd>{$order_info.store_name}<a href="javascript:void(0);" id="mapmore">更多<i class="fa fa-angle-down"></i>
+            <div class="more"><span class="arrow"></span>
+              <ul>
+                <li> 联系电话：<span>{notempty name="store_info.live_store_tel"}{$store_info.live_store_tel}{else /}{$store_info.store_phone}{/notempty}</span> </li>
+                <li>地&#12288;&#12288;址： <span>{notempty name="store_info.live_store_address"}{$store_info.live_store_address}{else /}{$store_info.store_address}{/notempty}</span> </li>
+                <li>
+                  <div id="container"></div>
+                </li>
+              </ul>
+            </div>
+            </a></dd>
+        </dl>
+      </div>
+    </div>
+    {if $order_info.order_state == ORDER_STATE_CANCEL}
+      <div class="dsm-order-condition">
+      <dl>
+        <dt><i class="fa fa-power-off orange"></i>订单状态：</dt>
+        <dd>交易关闭</dd>
+      </dl>
+      <ul>
+        <li>{:date('Y-m-d H:i:s',$order_info.close_time)}交易关闭，原因：{$order_info.close_reason}</li>
+      </ul>
+    </div>
+    {elseif $order_info.order_state == ORDER_STATE_NEW}
+      <div class="dsm-order-condition">
+      <dl>
+        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+        <dd>订单已生成，待付款</dd>
+      </dl>
+      <ul>
+        <li>1. 您尚未对该订单进行支付，请<a href="{:url('Buyvirtual/pay',['order_id'=>$order_info.order_id])}" class="dsm-btn-mini dsm-btn-orange"><i></i>支付订单</a>以确保及时获取电子兑换码。</li>
+        <li>2. 如果您不想购买此订单，请点击 <a href="#order-list" class="dsm-btn-mini">取消订单</a>。 </li>
+        <li>3. 系统将于
+          <time>{:date('Y-m-d H:i:s',$order_info.order_cancel_day)}</time>
+          自动关闭该订单，请您及时付款。</li>
+      </ul>
+    </div>
+    {elseif $order_info.order_state == ORDER_STATE_PAY}
+      <div class="dsm-order-condition">
+      <dl>
+        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+        <dd>已付款，电子兑换码已发放</dd>
+      </dl>
+      <ul>
+        <li>1. 本次电子兑换码已由系统自动发出，请查看您的接受手机短信或该页下方“电子兑换码”。</li>
+        <li>2. 您尚有&nbsp;<strong class="green">{$order_info.extend_vr_order_code.0.vr_code_valid_count}</strong>&nbsp;组电子兑换码未被使用；有效期为
+          <time>{:date('Y-m-d',$order_info.vr_indate)}</time>
+          ，逾期自动失效，请及时使用。</li>
+      </ul>
+    </div>
+     {elseif $order_info.order_state == ORDER_STATE_SUCCESS}
+      <div class="dsm-order-condition">
+      <dl>
+        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+        <dd>订单已完成。</dd>
+      </dl>
+      <ul>
+        <li>1. 使用期已经结束，感谢您的惠顾！</li>
+        <li>2. 去商城看看有没有新的<a href="{:url('Search/index')}" class="dsm-btn-mini dsm-btn-green" target="_blank">虚拟商品</a>。</li>
+      </ul>
+    </div>
+     {/if}
+      <div class="mall-msg">有疑问可咨询<a href="javascript:void(0);" onclick="ajax_form('mall_consult', '平台客服', '{:url('Membermallconsult/add_mallconsult',['inajax'=>1])}', 640);"><i class="fa fa-comments-o"></i>平台客服</a></div>
+  </div>
+  {if $order_info.order_state != ORDER_STATE_CANCEL}
+    <div class="dsm-order-step">
+    <dl class="step-first current">
+      <dt>生成订单</dt>
+      <dd class="bg"></dd>
+      <dd class="date" title="订单生成时间">{:date('Y-m-d H:i:s',$order_info.add_time)}</dd>
+    </dl>
+    <dl class="{$order_info.step_list.step2 ? 'current' : 'null'}">
+      <dt>完成付款</dt>
+      <dd class="bg"> </dd>
+      <dd class="date" title="付款时间">{:date('Y-m-d H:i:s',$order_info.payment_time)}</dd>
+    </dl>
+    <dl class="{$order_info.step_list.step3 ? 'current' : 'null'}">
+      <dt>发放兑换码</dt>
+      <dd class="bg"> </dd>
+    </dl>
+    <dl class="long {$order_info.step_list.step4 ? 'current' : 'null'}">
+      <dt>订单完成</dt>
+      <dd class="bg"> </dd>
+      <dd class="date" title="订单完成">{:date('Y-m-d H:i:s',$order_info.finnshed_time)}</dd>
+    </dl>
+      {notempty name="order_info.extend_vr_order_code"}
+        <div class="code-list" title="如列表过长超出显示区域时可滚动鼠标进行查看"><i class="arrow"></i>
+      <h5>电子兑换码</h5>
+      <div id="codeList">
+        <ul>
+          {foreach name="order_info.extend_vr_order_code" item="code_info"}
+            <li class="{if $code_info.vr_state==1}used{/if}"><strong>{$code_info.vr_code}</strong> {$code_info.vr_code_desc} </li>
+           {/foreach}
+        </ul>
+      </div>
+    </div>
+      {/notempty}
+  </div>
+   {/if}
+    <div class="dsm-order-contnet" id="order-list">
+    <table class="dsm-default-table order">
+      <thead>
+        <tr>
+          <th class="w10"></th>
+          <th colspan="2">商品</th>
+          <th class="w100 tl">单价 (元)</th>
+          <th class="w60">数量</th>
+          <th class="w100">售后</th>
+          <th class="w100">交易状态</th>
+          <th class="w120">交易操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th colspan="20">
+            <span class="ml10" title="虚拟订单号">虚拟订单号：{$order_info.order_sn}</span>
+            <span>下单时间：{:date('Y-m-d H:i',$order_info.add_time)}</span>
+            <span>
+            <a href="{:url('Store/index',['store_id'=>$order_info.store_id])}" title="{$order_info.store_name}">{$store_info.store_name}</a>
+          </span>
+              <!-- QQ -->
+            <span member_id="{$store_info.member_id}">
+              {notempty name="store_info.store_qq"}
+                <a target="_blank" href="{$Think.HTTP_TYPE}wpa.qq.com/msgrd?v=3&uin={$store_info.store_qq}&site=qq&menu=yes"  title="QQ: {$store_info.store_qq}">
+                  <img border="0" src="{$Think.HTTP_TYPE}wpa.qq.com/pa?p=2:{$store_info.store_qq}:52" style=" vertical-align: middle;"/></a>
+               {/notempty}
+
+                <!-- wang wang -->
+              {notempty name="store_info.store_ww"}
+              
+                <a target="_blank" href="http://amos.im.alisoft.com/msg.aw?v=2&uid={$store_info.store_ww}&site=cntaobao&s=2" class="vm">
+                    <img border="0" src="http://amos.im.alisoft.com/online.aw?v=2&uid={$store_info.store_ww}&site=cntaobao&s=2" alt="Wang Wang" style=" vertical-align: middle;"/></a>
+                {/notempty}
+            </span></th>
+        </tr>
+        <tr>
+          <td class="bdl"></td>
+          <td class="w50"><div class="pic-thumb"><a href="{:url('Goods/index',['goods_id'=>$order_info.goods_id])}" target="_blank" /><img src="{:goods_thumb($order_info)}"/></a></div></td>
+          <td class="tl"><dl class="goods-name">
+              <dt><a href="{:url('Goods/index',['goods_id'=>$order_info.goods_id])}" target="_blank" title="{$order_info.goods_name}">{$order_info.goods_name}</a></dt>
+              <dd><span class="sale-type">{if $order_info.order_promotion_type == 1}抢购，{/if}使用时效：即日起 至 {:date('Y-m-d',$order_info.vr_indate)}{if $order_info.vr_invalid_refund == '0'}，过期不退款{/if}
+              </span></dd>
+            </dl></td>
+          <td class="tl">{$order_info.goods_price}</td>
+          <td>{$order_info.goods_num}</td>
+          <td>
+            {if $order_info.if_refund}
+              <a href="{:url('Membervrrefund/add_refund',['order_id'=>$order_info.order_id])}">退款</a>
+             {/if}
+          </td>
+          <td class="bdl">{$order_info.state_desc}</td>
+          <td class="bdl bdr">
+            {if $order_info.if_cancel}
+              <a href="javascript:void(0)" class="dsm-btn dsm-btn-red" ds_type="dialog" dialog_width="480" dialog_title="取消订单" dialog_id="buyer_order_cancel_order" uri="{:url('Membervrorder/change_state',['state_type'=>'order_cancel','order_id'=>$order_info.order_id])}" id="order_action_cancel"><i class="fa fa-ban"></i>取消</a>
+             {/if}
+
+              <!-- 评价 -->
+            {if $order_info.if_evaluation}
+              <p><a class="dsm-btn dsm-btn-acidblue" href="{:url('Memberevaluate/add_vr',['order_id'=>$order_info.order_id])}">{$Think.lang.member_order_want_evaluate}</a></p>
+            {/if}
+
+              <!-- 已经评价 -->
+            {if $order_info.evaluation_state == 1}{$Think.lang.order_state_eval}{/if}
+
+              <!-- 分享  -->
+            {if $order_info.if_share}
+              <p><a href="javascript:void(0)" ds_type="sharegoods" data-param='{"gid":"{$order_info.goods_id}"}'>分享商品</a></p>
+             {/if}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="20">
+            <dl class="dsm-store-sales">
+               {notempty name="order_info.voucher_code"}
+              <dd><span>使用了 <strong>{$order_info.voucher_price}</strong> 元 代金券（编码：{$order_info.voucher_code}）</span></dd>
+             {/notempty}
+            </dl>
+          </th>
+        </tr>
+        <tr>
+          <td colspan="20"><dl class="sum">
+              <dt>订单应付金额：</dt>
+              <dd><em>{$order_info.order_amount}</em>元</dd>
+            </dl></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns.js" charset="utf-8"></script>
+<script src="{$Think.PLUGINS_SITE_ROOT}/perfect-scrollbar.min.js"></script>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/perfect-scrollbar.min.css">
+<script type="text/javascript">
+var cityName = '';
+store_name = '';
+{present name="store_info.live_store_address"}
+var address = '{:str_replace("'",'"',$store_info.live_store_address)}';
+var store_name = '{:str_replace("'",'"',$store_info.live_store_name)}';
+{/present}
+var map = "";
+var localCity = "";
+var opts = {width: 150, height: 50, title: "商铺名称:" + store_name}
+
+function initialize() {
+    map = new BMap.Map("container");
+    localCity = new BMap.LocalCity();
+
+    map.enableScrollWheelZoom();
+    map.addControl(new BMap.NavigationControl());
+    map.addControl(new BMap.ScaleControl());
+    map.addControl(new BMap.OverviewMapControl());
+    localCity.get(function (cityResult) {
+        if (cityResult) {
+            var level = cityResult.level;
+            if (level < 13) level = 13;
+            map.centerAndZoom(cityResult.center, level);
+            cityResultName = cityResult.name;
+            if (cityResultName.indexOf(cityName) >= 0) cityName = cityResult.name;
+            getPoint();
+        }
+    });
+}
+
+function loadScript() {
+    var script = document.createElement("script");
+    script.src = "{$Think.HTTP_TYPE}api.map.baidu.com/api?v=1.2&callback=initialize";
+    document.body.appendChild(script);
+}
+
+function getPoint() {
+    var myGeo = new BMap.Geocoder();
+    myGeo.getPoint(address, function (point) {
+        if (point) {
+            setPoint(point);
+        }
+    }, cityName);
+}
+
+function setPoint(point) {
+    if (point) {
+        map.centerAndZoom(point, 16);
+        var marker = new BMap.Marker(point);
+        var infoWindow = new BMap.InfoWindow("商铺地址:" + address, opts);
+        marker.addEventListener("click", function () {
+            this.openInfoWindow(infoWindow);
+        });
+        map.addOverlay(marker);
+        marker.openInfoWindow(infoWindow);
+    }
+}
+
+// 当鼠标放在店铺地图上再加载百度地图。
+$(function () {
+    $('#mapmore').one('mouseover', function () {
+        loadScript();
+    });
+});
+</script>
+{notempty name="order_info.extend_vr_order_code"}
+<script type="text/javascript">
+//兑换码列表过多时出现滚条
+$(function () {
+    $('#codeList').perfectScrollbar();
+});
+</script>
+{/notempty}
+<script>
+function closeErrors() {
+    return true;
+}
+
+window.onerror = closeErrors;
+</script>
+
+
+
+
+
+{/block}

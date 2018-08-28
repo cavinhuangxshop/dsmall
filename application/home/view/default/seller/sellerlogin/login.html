@@ -1,0 +1,75 @@
+{include file='default/base/mall_top'/}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home.css">
+<div class="header-login clearfix">
+    <div class="w1200">
+        <div class="logo">
+            <a href="{$Think.HOME_SITE_URL}"><img src="{$Think.config.url_attach_common}/{$Think.config.site_logo}"/></a>
+        </div>
+    </div>
+</div>
+        <link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/seller.css">
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function () {
+
+                //登陆表单验证
+                $("#form_login").validate({
+                    errorPlacement: function (error, element) {
+                        element.prev(".repuired").append(error);
+                    },
+                    onkeyup: false,
+                    rules: {
+                        seller_name: {
+                            required: true
+                        },
+                        member_password: {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        seller_name: {
+                            required: "<i class='fa fa-exclamation-circle'></i>用户名不能为空"
+                        },
+                        member_password: {
+                            required: "<i class='fa fa-exclamation-circle'></i>密码不能为空"
+                        }
+                    }
+                });
+                //Hide Show verification code
+                $("#hide").click(function () {
+                    $(".code").fadeOut("slow");
+                });
+                $("#captcha").focus(function () {
+                    $(".code").fadeIn("fast");
+                });
+
+            });
+        </script>
+        <div class="w1200">
+            <div class="dssc-login-container">
+                <div class="dssc-login-title">
+                    <h2>商家管理中心</h2>
+                    <span>请输入您注册商铺时申请的商家名称<br/>登录密码为商城用户通用密码</span>
+                </div>
+                <form id="form_login" action="" method="post" >
+                    <div class="input">
+                        <label>用户名</label>
+                        <span class="repuired"></span>
+                        <input name="seller_name" type="text" autocomplete="off" class="text" autofocus>
+                        <span class="ico"><i class="fa fa-user-o"></i></span> </div>
+                    <div class="input">
+                        <label>密码</label>
+                        <span class="repuired"></span>
+                        <input name="member_password" type="password" autocomplete="off" class="text">
+                        <span class="ico"><i class="fa fa-key"></i></span> 
+                    </div>
+                    <div class="input">
+                        <input type="submit" class="login-submit" value="商家登录">
+                    </div>
+                    <div class="mt10 fr"><a href="{$Think.HOME_SITE_URL}" title="返回首页">返回首页</a></div>
+                </form>
+            </div>
+        </div>
+        <div class="dssc-login-bg">
+        </div>
+        
+{include file='default/base/mall_footer'/}

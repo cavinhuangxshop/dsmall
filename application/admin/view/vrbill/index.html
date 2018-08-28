@@ -1,0 +1,101 @@
+{include file="public/header" /}
+
+
+<div class="page">
+  <div class="fixed-bar">
+    <div class="item-title">
+      <div class="subject">
+        <h3>虚拟订单结算</h3>
+        <h5></h5>
+      </div>
+      {include file="public/admin_items" /}
+    </div>
+  </div>
+  <div class="fixed-empty"></div>
+  <form method="get" action="" name="formSearch" id="formSearch">
+      <div class="ds-search-form">
+            <dl>
+                <dt>{$Think.lang.order_time_from}按年份搜索</dt>
+                <dd>
+                    <select name="query_year" class="querySelect">
+                        <option value="">{$Think.lang.ds_please_choose}</option>
+                        <?php for($i = date('Y',TIMESTAMP)-4; $i <= date('Y',TIMESTAMP)+3; $i++) { ?>
+                        <option value="{$i}" {if $Request.get.query_year == $i}selected{/if}>{$i}</option>
+                        <?php } ?>
+                    </select>
+                </dd>
+            </dl>
+            <dl>
+                <dt></dt>
+                <dd></dd>
+            </dl>
+            <div class="btn_group">
+                <a href="javascript:document.formSearch.submit();" class="btn " title="{$Think.lang.ds_query}">{$Think.lang.ds_query}</a>
+                {if $filtered}
+                <a href="{:url('Vrbill/index')}" class="btn btn-default" title="{$Think.lang.ds_cancel}">{$Think.lang.ds_cancel}</a>
+                {/if}
+            </div>
+        </div>
+  </form>
+  
+  <div class="explanation" id="explanation">
+      <div class="title" id="checkZoom">
+          <h4 title="{$Think.lang.ds_explanation_tip}">{$Think.lang.ds_explanation}</h4>
+          <span id="explanationZoom" title="{$Think.lang.ds_explanation_close}" class="arrow"></span>
+      </div>
+      <ul>
+          <li>此处列出了平台每月的结算信息汇总，点击查看可以查看本月详细的店铺账单信息列表</li>
+      </ul>
+  </div>
+  
+  
+  <table class="ds-default-table">
+    <thead>
+      <tr class="thead">
+        <th>{$Think.lang.order_number}账单（月）</th>
+        <th class="align-center">开始日期</th>
+        <th class="align-center">结束日期</th>
+        <th class="align-center">订单金额</th>
+        <th class="align-center">收取佣金</th>
+        <th class="align-center">本期应结</th>
+        <th class="align-center">{$Think.lang.ds_handle}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {notempty name="bill_list"}
+      {foreach name="bill_list" item="bill"}
+      <tr class="hover">
+        <td>
+            <?php echo substr($bill['vros_month'],0,4).'-'.substr($bill['vros_month'],4);?>
+        </td>
+        <td class="nowrap align-center">{$bill.vros_startdate|date="Y-m-d",###}</td>
+        <td class="nowrap align-center">{$bill.vros_enddate|date="Y-m-d",###}</td>
+        <td class="align-center">{$bill.vros_order_totals}</td>
+        <td class="align-center">{$bill.vros_commis_totals}</td>
+        <td class="align-center">{$bill.vros_result_totals}</td>
+        <td class="align-center">
+        <a href="{:url('Vrbill/show_statis',['vros_month'=>$bill.vros_month])}" class="dsui-btn-view"><i class="fa"></i>{$Think.lang.ds_view}</a>
+        </td>
+      </tr>
+      {/foreach}
+      {else /}
+      <tr class="no_data">
+        <td colspan="15">{$Think.lang.ds_no_record}</td>
+      </tr>
+      {/notempty}
+    </tbody>
+    {notempty name="bill_list"}
+    <tfoot>
+      <tr class="tfoot">
+        <td colspan="15" id="dataFuncs">{$show_page}</td>
+      </tr>
+    </tfoot>
+    {/notempty}
+  </table>
+</div>
+<script type="text/javascript">
+$(function(){
+    $('#add_time_from').datepicker({dateFormat: 'yy-mm-dd'});
+    $('#add_time_to').datepicker({dateFormat: 'yy-mm-dd'});
+});
+</script>

@@ -1,0 +1,139 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_btn"}
+{present name="isPlatformStore"}
+<a href="{:url('Sellergroupbuy/groupbuy_add_vr')}" style="right:100px"
+   class="dssc-btn dssc-btn-green" title="新增虚拟商品抢购"><i class="fa fa-plus-square"></i>新增虚拟抢购</a>
+<a href="{:url('Sellergroupbuy/groupbuy_add')}" class="dssc-btn dssc-btn-green"
+   title="{$Think.lang.groupbuy_index_new_group}"><i
+        class="fa fa-plus-square"></i>{$Think.lang.groupbuy_index_new_group}</a>
+{else /}
+{notempty name="current_groupbuy_quota"}
+
+<a href="{:url('Sellergroupbuy/groupbuy_add_vr')}" style="right:200px"
+   class="dssc-btn dssc-btn-green" title="新增虚拟商品抢购"><i class="fa fa-plus-square"></i>新增虚拟抢购</a>
+<a href="{:url('Sellergroupbuy/groupbuy_add')}" style="right:100px"
+   class="dssc-btn dssc-btn-green" title="{$Think.lang.groupbuy_index_new_group}"><i
+        class="fa fa-plus-square"></i>{$Think.lang.groupbuy_index_new_group}</a>
+<a class="dssc-btn dssc-btn-acidblue" href="{:url('Sellergroupbuy/groupbuy_quota_add')}"
+   title="套餐续费"><i class="fa fa-money"></i>套餐续费</a>
+{else /}
+<a class="dssc-btn dssc-btn-acidblue" href="{:url('Sellergroupbuy/groupbuy_quota_add')}"
+   title="购买套餐"><i class="fa fa-money"></i>购买套餐</a>
+{/notempty}
+{/present}
+
+
+{/block}
+{block name="seller_main"}
+{present name="isPlatformStore"}
+<div class="alert alert-block mt10">
+    <ul class="mt5">
+        <li>1、点击新增抢购按钮可以添加抢购活动</li>
+        <li>2、如发布虚拟商品的抢购活动，请点击新增虚拟抢购按钮</li>
+    </ul>
+</div>
+{else /}
+<div class="alert alert-block mt10">
+    {notempty name="current_groupbuy_quota"}
+    <strong>套餐过期时间{$Think.lang.ds_colon}</strong><strong
+        style="color: #F00;">{$current_groupbuy_quota.groupbuyquota_endtime|date="Y-m-d H:i:s",###}</strong>
+    {else /}
+    <strong>当前没有可用套餐，请先购买套餐</strong>
+    {/notempty}
+    <ul class="mt5">
+        <li>1、点击购买套餐和套餐续费按钮可以购买或续费套餐</li>
+        <li>2、点击新增抢购按钮可以添加抢购活动</li>
+        <li>3、如发布虚拟商品的抢购活动，请点击新增虚拟抢购按钮</li>
+        <li>4、<strong style="color: red">相关费用会在店铺的账期结算中扣除</strong></li>
+    </ul>
+</div>
+{/present}
+<form method="get">
+    <table class="search-form">
+        <tr>
+            <td>&nbsp;</td>
+            <th>抢购类型</th>
+            <td class="w100">
+                <select name="groupbuy_vr" class="w90">
+                    <option value="">全部</option>
+                    <option value="0" {if $Request.get.groupbuy_vr=='0'}selected{/if}>线上抢</option>
+                    <option value="1" {if $Request.get.groupbuy_vr=='1'}selected{/if}>虚拟抢</option>
+                </select>
+            </td>
+            <th>{$Think.lang.groupbuy_index_activity_state}</th>
+            <td class="w100"><select name="groupbuy_state" class="w90">
+                    {notempty name="groupbuy_state_array"}
+                    {foreach name="groupbuy_state_array" item="val"}
+                    <option value="{$key}" {if $key== $Request.get.groupbuy_state}selected{/if}>{$val}</option>
+                    {/foreach}
+                    {/notempty}
+                </select></td>
+            <th>{$Think.lang.group_name}</th>
+            <td class="w160">
+                <input class="text" type="text" name="groupbuy_name" value="{$Request.get.groupbuy_name}"/>
+            </td>
+            <td class="w70 tc">
+                <label class="submit-border">
+                    <input type="submit" class="submit" value="{$Think.lang.ds_search}"/>
+                </label>
+            </td>
+        </tr>
+    </table>
+</form>
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w10"></th>
+            <th class="w50"></th>
+            <th class="tl">{$Think.lang.group_name}</th>
+            <th class="w130">开始时间</th>
+            <th class="w130">结束时间</th>
+            <th class="w90">浏览数</th>
+            <th class="w90">已购买</th>
+            <th class="w110">{$Think.lang.groupbuy_index_activity_state}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="group"}
+        {foreach name="group" item="group"}
+        <tr class="bd-line">
+            <td></td>
+            <td>
+                <div class="pic-thumb"><a href="{$group.groupbuy_url}" target="_blank"><img src="{:groupbuy_thumb($group.groupbuy_image,'small')}"/></a></div>
+            </td>
+            <td class="tl">
+                <dl class="goods-name">
+                    <dt>
+                        {if $group.groupbuy_is_vr}
+                        <span title="虚拟兑换商品" class="type-virtual">虚拟抢</span>
+                        {/if}
+                        <a target="_blank" href="{$group.groupbuy_url}">{$group.groupbuy_name}</a>
+                    </dt>
+                </dl>
+            </td>
+            <td>{$group.start_time_text}</td>
+            <td>{$group.end_time_text}</td>
+            <td>{$group.groupbuy_views}</td>
+            <td>{$group.groupbuy_buy_quantity}</td>
+            <td>{$group.groupbuy_state_text}</td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr>
+            <td colspan="20" class="norecord">
+                <div class="warning-option"><i class="fa fa-warning"></i><span>{$Think.lang.no_record}</span></div>
+            </td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="20">
+                <div class="pagination">{$show_page}</div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+
+{/block}

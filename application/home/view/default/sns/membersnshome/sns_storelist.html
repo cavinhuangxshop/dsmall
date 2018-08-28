@@ -1,0 +1,124 @@
+{extend name="default/base/base_sns" /}
+{block name="sns_main"}
+
+
+
+
+<style type="text/css">
+.ds-carousel-container { width: 700px; margin: 10px 0;}
+.ds-carousel-container .goods-pic { width: 175px; height: 175px;}
+.ds-carousel-container .goods-pic a { line-height: 0; background-color: #FFF; text-align: center; vertical-align: middle; display: table-cell; *display: block; width: 175px; height: 175px; overflow: hidden;}
+.ds-carousel-container .goods-pic a img { max-width: 175px; max-height: 175px; margin-top:expression(175-this.height/2); *margin-top:expression(87-this.height/2)/*IE6,7*/;}
+.share-content #mycarousel-g li { width: auto !important;}
+</style>
+<div class="sns-main-all">
+    <div class="tabmenu">
+        <ul class="tab">
+            <li class="active"><a href="javascript:void(0)">{$Think.lang.sns_share_shop}</a></li>
+        </ul>
+        {if $relation==3}
+        <div class="release-banner"> <span class="sns-btn"><a href="javascript:void(0);" id="snssharestore">+ {$Think.lang.sns_sharestore}</a></span></div>
+        {/if}
+    </div>
+
+  <!-- 店铺列表 -->
+  <div class="shoplist-module" id="shoplist-module">
+    {notempty name="storelist"}
+    <ul>
+      {foreach name="storelist" item="v" key="k" }
+      <li class="shop-item" id="recordone_{$v.sharestore_id}">
+        <dl>
+          <dt>
+            <h3><a href="javascript:void(0)">{$v.sharestore_membername}</a>{$v.sharestore_addtime|date='Y-m-d',###}</h3>
+            {if $relation==3}
+            <div class="set-btn fr" ds_type="privacydiv"><a href="javascript:void(0)" ds_type="formprivacybtn"><i class="fa fa-cog"></i>{$Think.lang.sns_setting}</a>
+            <ul class="set-menu" ds_type="privacytab" style="display: none;">
+              <li ds_type="privacyoption" data-param='{"sid":"{$v.sharestore_id}","v":"0","action":"store"}'><span class="{if $v.sharestore_privacy==0}selected{/if}">{$Think.lang.sns_open}</span></li>
+              <li ds_type="privacyoption" data-param='{"sid":"{$v.sharestore_id}","v":"1","action":"store"}'><span class="{if $v.sharestore_privacy==1}selected{/if}">{$Think.lang.sns_friend}</span></li>
+              <li ds_type="privacyoption" data-param='{"sid":"{$v.sharestore_id}","v":"2","action":"store"}'><span class="{if $v.sharestore_privacy==2}selected{/if}">{$Think.lang.sns_privacy}</span></li>
+              <li ds_type="storedelbtn" data-param='{"sid":"{$v.sharestore_id}"}'><span class="del"><a href="javascript:void(0);">{$Think.lang.ds_delete}</a></span></li>
+            </ul></div>
+            {/if}
+          </dt>
+          <dd><i class="pngFix"></i>
+            <p>{if $v.sharestore_content != ''}{$v.sharestore_content}{$Think.lang.sns_shared_the_shop}{/if}<i class="pngFix"></i></p>
+          </dd>
+        </dl>
+        <div class="shop-content">
+          <div class="arrow pngFix">&nbsp;</div>
+          <div class="info">
+            <div class="title"><a title="{$v.store_name}" href="{:url('Store/index',['store_id'=>$v.store_id])}"><i class="ico" ></i>{$v.store_name}</a>
+            </div>
+          </div>
+          <div class="detail">
+              {notempty name="$v.goods"}
+              <ul ds_type="mycarousel" class="ds-carousel-skin">
+                  {foreach name="$v.goods" item="g_v" key="g_k" }
+                  <li><div class="goods-pic"><a href="{$g_v.goodsurl}" target="_blank"><img alt="{$g_v.goods_name}" src="{:goods_thumb($g_v,240)}" width="160" height="160" /></a></div></li>
+                  {/foreach}
+              </ul>
+            {/notempty}
+          </div>
+          <div class="operate">
+            <ul class="status">
+              <li>
+                <p class="number">{$v.goods_count}</p>
+                <p class="kind">{$Think.lang.sns_sharestore_allgoods}</p>
+              </li>
+              <li>
+                <p class="number">{$v.store_collect}</p>
+                <p class="kind">{$Think.lang.sns_sharestore_collectnum}</p>
+              </li>
+            </ul>
+            <div class="button"><span><a href="{:url('Store/index',['store_id'=>$v.store_id])}">{$Think.lang.sns_round_store}</a></span><span><a href="javascript:collect_store('{$v.store_id}','count','store_collect')">{$Think.lang.sns_collect_store}</a></span></div>
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+      </li>
+      {/foreach}
+    </ul>
+    <div class="pagination">{$show_page}</div>
+    {else/}
+    {if $relation==3}
+    <div class="sns-norecord"><i class="store-ico pngFix"></i><span>{$Think.lang.sns_sharestore_nohave_self_1}<a href="{:url('Memberfavorites/fslist')}" target="_blank">{$Think.lang.sns_sharestore_nohave_self_2}</a>{$Think.lang.sns_sharestore_nohave_self_3}</span></div>
+    {else/}
+    <div class="sns-norecord"><i class="store-ico pngFix"></i><span>{$Think.lang.sns_sharestore_nohave_1}
+      </span></div>
+    {/if}
+    {/notempty}
+  </div>
+  <div class="clear"></div>
+</div>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript">
+$(function(){
+	//图片轮换
+    jQuery('.shop-content .detail').slide({mainCell:"[ds_type='mycarousel']",effect:"left",autoPlay:true,vis:4});    
+  	//删除分享的店铺
+	$("[ds_type='storedelbtn']").on('click',function(){
+		var data_str = $(this).attr('data-param');
+        eval( "data_str = "+data_str);
+        showDialog('{$Think.lang.ds_common_op_confirm}','confirm', '', function(){
+        	ajax_get_confirm('','{$Think.HOME_SITE_URL}/Membersnsindex/delstore.html?id='+data_str.sid);
+			return false;
+		});
+	});
+
+	//显示分享店铺页面
+	$('#snssharestore').click(function(){
+	    ajax_form("sharestore", '{$Think.lang.sns_sharestore}', '{:url("Membersnsindex/sharestore")}', 480);
+	    return false;
+	});
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+{/block}

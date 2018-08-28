@@ -1,0 +1,114 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>推广设置</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id="inviter_form" method="post" enctype="multipart/form-data" name="form1" action="">
+        <table class="ds-default-table">
+                <tbody>
+                    <tr class="noborder"> 
+                        <td class="required w120">{$Think.lang.inviter_back}</td>
+                        <td class="vatop rowform">
+                            {notempty name="$list_setting.inviter_back"}
+                            <span class="type-file-show"><img class="show_image" src="{$Think.ADMIN_SITE_ROOT}/images/preview.png">
+                                <div class="type-file-preview"><img src="{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_COMMON}/{$list_setting.inviter_back}"></div>
+                            </span>
+                            {/notempty}
+                            <span class="type-file-box"><input type='text' name='textfield' id='textfield1' class='type-file-text' />
+                                <input type='button' name='button' id='button1' value='' class='type-file-button' />
+                                <input name="inviter_back" type="file" class="type-file-file" id="inviter_back" size="30" hidefocus="true" ds_type="change_inviter_back">
+                            </span>
+                        </td>
+                        <td class="vatop tips"><p class="notic">推广背景图片，最佳显示尺寸为320*426像素</p></td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w120">一级推广佣金比例</td>
+                        <td class="vatop rowform">
+                            <input id="inviter_ratio_1" name="inviter_ratio_1" value="{$list_setting.inviter_ratio_1}" class="input-txt" type="text">%
+                            <span class="err"></span>     
+                        </td>
+			<td class="vatop tips">基数为订单总商品金额，请确保一二三级佣金比例之和不要大于最小分类分佣比例</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w120">二级推广佣金比例</td>
+                        <td class="vatop rowform">
+                            <input id="inviter_ratio_2" name="inviter_ratio_2" value="{$list_setting.inviter_ratio_2}" class="input-txt" type="text">%
+                        </td>
+			<td class="vatop tips">基数为订单总商品金额，请确保一二三级佣金比例之和不要大于最小分类分佣比例</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w120">三级推广佣金比例</td>
+                        <td class="vatop rowform">
+                            <input id="inviter_ratio_3" name="inviter_ratio_3" value="{$list_setting.inviter_ratio_3}" class="input-txt" type="text">%
+                        </td>
+			<td class="vatop tips">基数为订单总商品金额，请确保一二三级佣金比例之和不要大于最小分类分佣比例</td>
+                    </tr>                    
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td></td>
+                        <td colspan="15"><a href="JavaScript:void(0);" class="btn" id="submitBtn">确认提交</a></td>
+                    </tr>					
+                </tfoot>
+            </table>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $("#submitBtn").click(function() {
+            if ($("#inviter_form").valid()) {
+                $("#inviter_form").submit();
+            }
+        });
+        $('#inviter_form').validate({
+            errorPlacement: function(error, element) {
+                error.appendTo(element.parent().parent().find('td:last'));
+            },
+            rules: {
+                inviter_ratio_1 : {
+                    number:true,
+                    min:0,
+                    max:100
+                },
+                inviter_ratio_2 :{
+                    number:true,
+                    min:0,
+                    max:100
+                },
+                inviter_ratio_3 :{
+                    number:true,
+                    min:0,
+                    max:100
+                }
+            },
+            messages: {
+                inviter_ratio_1 : {
+                    number   : '请输入有效的数字',
+                    min :'值不能小于0',
+                    max :'值不能大于100'
+                },
+                inviter_ratio_2 :{
+                    number : '请输入有效的数字',
+                    min :'值不能小于0',
+                    max :'值不能大于100'
+                },
+                inviter_ratio_3 :{
+                    number: '请输入有效的数字',
+                    min :'值不能小于0',
+                    max :'值不能大于100'
+                }
+            }
+        });
+    });
+</script>

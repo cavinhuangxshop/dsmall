@@ -1,0 +1,203 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+<div class="dssc-oredr-show">
+    <div class="dssc-order-info">
+        <div class="dssc-order-details">
+            <div class="title">虚拟订单信息</div>
+            <div class="content">
+                <dl>
+                    <dt>虚拟单号：</dt>
+                    <dd>{$order_info.order_sn}<a href="javascript:void(0);">更多<i class="fa fa-angle-down"></i>
+                            <div class="more"><span class="arrow"></span>
+                                <ul>
+                                    <li>支付方式：{:get_order_payment_name($order_info['payment_code'])}</li>
+                                    <li>下单时间：<span>{$order_info.add_time|date="Y-m-d H:i:s",###}</span></li>
+                                    {notempty name="$order_info.payment_time"}
+                                    <li>付款时间：<span>{$order_info.payment_time|date="Y-m-d H:i:s",###}</span></li>
+                                    {/notempty}
+                                </ul>
+                            </div>
+                        </a></dd>
+                </dl>
+                <dl class="line">
+                    <dt>买&#12288;&#12288;家：</dt>
+                    <dd>{$order_info.buyer_name}</dd>
+                </dl>
+                <dl class="line">
+                    <dt>接收手机：</dt>
+                    <dd>{$order_info.buyer_phone}</dd>
+                </dl>
+                <dl class="line">
+                    <dt>买家留言：</dt>
+                    <dd>{$order_info.buyer_msg}</dd>
+                </dl>
+            </div>
+        </div>
+        {if $order_info['order_state'] == ORDER_STATE_CANCEL}
+        <div class="dssc-order-condition">
+            <dl>
+                <dt><i class="fa fa-power-off orange"></i>订单状态：</dt>
+                <dd>交易关闭</dd>
+            </dl>
+            <ul>
+                <li>{$order_info.close_time|date="Y-m-d H:i:s",###} 交易关闭，原因：{$order_info.close_reason}</li>
+            </ul>
+        </div>
+        {/if}
+        {if $order_info['order_state'] == ORDER_STATE_NEW}
+        <div class="dssc-order-condition">
+            <dl>
+                <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                <dd>订单已经生成，等待买家付款</dd>
+            </dl>
+            <ul>
+                <li>1. 买家尚未对该订单进行支付。</li>
+                <li>2. 如果该订单是一个无效订单，您可以点击 <a href="javascript:void(0)" class="dssc-btn-mini" ds_type="dialog" dialog_width="480" dialog_title="取消订单" dialog_id="buyer_order_cancel_order" uri="{:url('Sellervrorder/change_state',['state_type'=>'order_cancel','order_id'=>$order_info.order_id,'order_sn'=>$order_info.order_sn])}"  id="order_action_cancel">取消订单</a>。 </li>
+                <li>2. 如果买家未对该笔订单进行支付，系统将于
+                    <time>{$order_info.order_cancel_day|date="Y-m-d H:i:s",###}</time>
+                    自动关闭该订单。</li>
+            </ul>
+        </div>
+        {/if}
+        {if $order_info['order_state'] == ORDER_STATE_PAY}
+        <div class="dssc-order-condition">
+            <dl>
+                <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                <dd>买家已付款，电子兑换码已发放</dd>
+            </dl>
+            <ul>
+                <li>1. 该笔订单的电子兑换码已由系统自动发送至买家接收。</li>
+                <li>2. 本次交易从即日起至
+                    <time>{$order_info.vr_indate|date="Y-m-d",###}</time>
+                    ，逾期自动失效。</li>
+            </ul>
+        </div>
+        {/if}
+        {if $order_info['order_state'] == ORDER_STATE_SUCCESS}
+        <div class="dssc-order-condition">
+            <dl>
+                <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                <dd>订单完成。</dd>
+            </dl>
+        </div>
+        {/if}
+    </div>
+    {if $order_info['order_state'] != ORDER_STATE_CANCEL}
+    <div class="dssc-order-step">
+        <dl class="step-first current">
+            <dt>生成订单</dt>
+            <dd class="bg"></dd>
+            <dd class="date" title="订单生成时间">{$order_info.add_time|date="Y-m-d H:i:s",###}</dd>
+        </dl>
+        <dl class="{if $order_info.step_list.step2}current{/if}">
+            <dt>完成付款</dt>
+            <dd class="bg"> </dd>
+            <dd class="date" title="付款时间"><?php echo @date('Y-m-d H:i:s',$order_info['payment_time']); ?></dd>
+        </dl>
+        <dl class="{if $order_info.step_list.step3}current{/if}">
+            <dt>发放兑换码</dt>
+            <dd class="bg"> </dd>
+        </dl>
+        <dl class="long {if $order_info.step_list.step4}current{/if}">
+            <dt>订单完成</dt>
+            <dd class="bg"> </dd>
+            <dd class="date" title="订单完成">{$order_info.finnshed_time|date="Y-m-d H:i:s",###}</dd>
+        </dl>
+        <div class="code-list tip" title="如列表过长超出显示区域时可滚动鼠标进行查看"><i class="arrow"></i>
+            <h5>电子兑换码</h5>
+            <div id="codeList">
+                <ul>
+                    {foreach name="$order_info.extend_vr_order_code" item="code_info" }
+                    <li class="{if $code_info.vr_state==1}used{/if}"><strong><?php echo $code_info['vr_state'] == '0' ? ($code_info['vr_indate'] < TIMESTAMP ? $code_info['vr_code'] : encrypt_show($code_info['vr_code'],7,12)) : $code_info['vr_code'];?></strong> {$code_info.vr_code_desc} </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {else/}
+    <br/>
+    {/if}
+  <div class="dssc-order-contnet">
+    <table class="dssc-default-table order">
+      <thead>
+        <tr>
+          <th class="w10"></th>
+          <th colspan="2">商品</th>
+          <th class="w100">单价 (元)</th>
+          <th class="w60">数量</th>
+          <th class="w240"><strong>实付 * 佣金比 = 应付佣金(元)</strong></th>
+          <th class="w100">交易状态</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th colspan="20"><span class="ml10" title="虚拟订单号">虚拟订单号：{$order_info.order_sn}</span><span>下单时间：{$order_info.add_time|date="Y-m-d H:i",###}</span><span><a href="{:url('Store/index',['store_id'=>$order_info.store_id])}" title="{$order_info.store_name}">{$order_info.store_name}</a></span></th>
+        </tr>
+        <tr>
+          <td class="bdl"></td>
+          <td><div class="pic-thumb"><a href="{:url('Goods/index',['goods_id'=>$order_info.goods_id])}" target="_blank"/><img src="{:goods_thumb($order_info, 240)}"/></a></div></td>
+          <td class="tl"><dl class="goods-name">
+              <dt><a href="{:url('Goods/index',['goods_id'=>$order_info.goods_id])}" target="_blank" title="{$order_info.goods_name}">{$order_info.goods_name}</a></dt>
+              <dd><span class="sale-type">{if $order_info.order_promotion_type == 1}抢购，{/if}使用时效：即日起 至 {$order_info.vr_indate|date="Y-m-d",###}
+              {if $order_info.vr_invalid_refund == '0'}
+              ，过期不退款
+              {/if}
+              </span></dd>
+            </dl></td>
+          <td>{$order_info.goods_price}</td>
+          <td>{$order_info.goods_num}</td>
+          <td class="commis bdl bdr">
+          {if $order_info.commis_rate != 200}
+          {:ds_price_format($order_info['order_amount'])}*{$order_info['commis_rate']}%  = {:ds_price_format($order_info['order_amount'] * $order_info['commis_rate']/100)}
+          {/if}
+          </td>
+          <td class="bdl">{$order_info.state_desc}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        {notempty name="$order_info.voucher_code"}
+        <tr>
+          <th colspan="20"><dl class="dssc-store-sales">
+              {notempty name="$order_info.voucher_code"}
+              <dd><span>&emsp;使用了 <strong>{$order_info.voucher_price}</strong> 元 代金券（编码：{$order_info.voucher_code}）</span></dd>
+              {/notempty}
+            </dl>
+          </th>
+        </tr>
+        {/notempty}
+        <tr>
+          <td colspan="20" class="transportation tl"><dl class="sum">
+              <dt>订单金额：</dt>
+              <dd><em>{$order_info.order_amount}</em>元</dd>
+            </dl></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+<script>
+    jQuery.browser={};(function(){jQuery.browser.msie=false; jQuery.browser.version=0;if(navigator.userAgent.match(/MSIE ([0-9]+)./)){ jQuery.browser.msie=true;jQuery.browser.version=RegExp.$1;}})();
+</script>
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.poshytip.min.js"></script>
+<script type="text/javascript">
+//兑换码列表过多时出现滚条
+$(function(){
+	$('#codeList').perfectScrollbar();
+	//title提示
+    	$('.tip').poshytip({
+            className: 'tip-yellowsimple',
+            showTimeout: 1,
+            alignTo: 'target',
+            alignX: 'left',
+            alignY: 'top',
+            offsetX: 5,
+            offsetY: -60,
+            allowTipHover: false
+        });
+});
+</script>
+
+
+{/block}
+

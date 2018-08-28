@@ -1,0 +1,139 @@
+<div class="side-message">
+  <div class="title">
+    <h4>{if $relation==3}{$Think.lang.sns_visitor_messages}{else/}{$Think.lang.sns_leave_a_message}{/if}</h4>
+  </div>
+  {if $relation!=3}
+  <div class="guest-form">
+      <form id="send_form" action="{:url('Membermessage/savemsg',['type'=>'sns_board'])}" method="post">
+          <input type="hidden" name="msg_type" value="2" />
+          <input type="hidden" value="{$master_info.member_name}" name="to_member_name">
+          <textarea id="content_msg" name="msg_content" placeholder="{$Think.lang.sns_message_content_placeholder}@<?php echo !empty($master_info['member_truename'])?$master_info['member_truename']:$master_info['member_name'];?>{$Think.lang.sns_talk}~" class="msg-content"></textarea>
+          <div class="action"> <a class="face" href="javascript:void(0);" data-param='{"txtid":"msg"}' ds_type="smiliesbtn">{$Think.lang.sns_smiles}</a><a href="javascript:void(0);" dstype="commentbtn" class="btn">{$Think.lang.sns_speak}</a><span class="charcount"><em id="commentcharcount"></em>/140</span></div>
+      </form>
+  </div>
+  {/if}
+  <div dstype="message_list" class="message-list">
+    {notempty name="message_list"}
+    {foreach name="message_list" item="val"}
+    <dl dstype="dl{$val.message_id}">
+      <dt><a href="{:url('Membersnshome/index',['mid'=>$val.from_member_id])}" data-param="{'id':{$val.from_member_id}}" dstype="mcard">{$val.from_member_name}{$Think.lang.ds_colon}</a><span>{:parsesmiles($val['message_body'])}</span></dt>
+      <dd data-param="{'msgid':'{$val.message_id}','fname':'{$val.from_member_name}'}"><span class="time">{$val.message_time}</span><span class="handle">
+        {if $relation==3}
+        <a href="javascript:void(0);" dstype="reply_msg">{$Think.lang.sns_reply}</a>|
+        {/if}
+        {if $relation==3 || $val.from_member_id==$Think.session.member_id}
+        <a  onclick="ajax_get_confirm('{$Think.lang.ds_common_op_confirm}', '{$Think.HOME_SITE_URL}/Membermessage/dropcommonmsg.html?drop_type=sns_msg&message_id={$val.message_id}');" href="javascript:void(0);">{$Think.lang.ds_delete}</a>
+        {/if}
+        </span> </dd>
+      <?php if(isset($rmessage_list[$val['message_id']])){?>
+      <dd>
+        <?php foreach ($rmessage_list[$val['message_id']] as $v){?>
+        <dl class="re-content">
+          <dt><a href="{:url('Membersnshome/index',['mid'=>$v.from_member_id])}">{$v.from_member_name}{$Think.lang.sns_reply}{$Think.lang.ds_colon}</a><span>{:parsesmiles($v['message_body'])}</span></dt>
+          <dd data-param="{'msgid':'{$v.message_id}'}"><span class="time">{$v.message_time}</span></dd>
+        </dl>
+        <?php }?>
+      </dd>
+      <?php }?>
+    </dl>
+   {/foreach}
+    {else /}
+      <div>{$Think.lang.sns_message_null}</div>
+    {/notempty}
+  </div>
+</div>
+<script >
+$(function(){
+	$("[ds_type='visitmodule']").bind('click',function(){
+		var data_str = $(this).attr('data-param');
+	    eval( "data_str = "+data_str);
+	    $("[ds_type='visitmodule']").removeClass('active');
+	    $("[ds_type='visitmodule']").addClass('normal');
+	    $(this).removeClass('normal');
+	    $(this).addClass('active');
+	    $("[ds_type='visitlist']").hide();
+	    $("#"+data_str.name).show();
+	});
+
+	// 回复提交
+	$("[dstype='commentbtn']").on('click',function(){
+		if($("#send_form").valid()){
+			ajaxpost('send_form', '', '', 'onerror');
+		}
+		return false;
+	});
+	$('#send_form').validate({
+		errorPlacement: function(error, element){
+			element.after(error);
+		},      
+		rules : {
+			msg_content : {
+				required : true,
+				maxlength: 140
+			}
+		},
+		messages : {
+			msg_content : {
+				required : '{$Think.lang.sns_message_content_not_null}',
+				maxlength: '{$Think.lang.sns_message_content_max_140}'
+			}
+		}
+	});
+
+	//评论字符个数动态计算
+	$("#content_msg").charCount({
+		allowed: 140,
+		warning: 10,
+		counterContainerID:'commentcharcount',
+		errortype: 'negative'
+	});
+
+	// 回复
+	$('a[dstype="reply_msg"]').on('click', function(){
+		var p_dd = $(this).parents('dd:first');
+		var data; eval('data = ' + p_dd.attr('data-param'));
+		if(!p_dd.next().is('dd[dstype="replyform"]')){
+			$('<dd dstype="replyform" class="re-msg"></dd>')
+				.append('<i></i>')
+				.append('<form id="replyform'+data.msgid+'" action="{$Think.HOME_SITE_URL}/Membermessage/savereply.html" method="post"></form>').children('form')
+				.append('<input type="hidden" value="'+data.msgid+'" name="message_id">')
+				.append('<textarea class="re-msg-content" name="msg_content" id="content_msg'+data.msgid+'" placeholder="{$Think.lang.sns_reply}@'+data.fname+'~"></textarea><div class="action"></div>').children('div')
+				.append('<a class="face" ds_type="smiliesbtn" data-param=\'{"txtid":"msg'+data.msgid+'"}\' href="javascript:void(0);">{$Think.lang.sns_smiles}</a>')
+				.append('<a ds_type="commentbtn'+data.msgid+'" class="btn" href="javascript:void(0);">{$Think.lang.ds_submit}</a>')
+				.append('<span class="charcount"><em id="commentcharcount'+data.msgid+'"></em>/140</span>')
+				.end().end().insertAfter(p_dd);
+			//评论字符个数动态计算
+			$("#content_msg"+data.msgid).charCount({
+				allowed: 140,
+				warning: 10,
+				counterContainerID:'commentcharcount'+data.msgid,
+				errortype: 'negative'
+			});
+			// 回复提交
+			$("[ds_type='commentbtn"+data.msgid+"']").on('click',function(){
+				if($("#content_msg"+data.msgid).val().length <= 140){
+					ajaxpost("replyform"+data.msgid, '', '', 'onerror');
+				}
+				return false;
+			});
+		}
+	});
+});
+
+function leaveMsgSuccess(data){
+	$('<dl></dl>')
+		.append('<dt><a href="{$Think.HOME_SITE_URL}/Membersnshome/index.html?mid='+data.from_member_id+'">'+data.from_member_name+'{$Think.lang.ds_colon}</a><span>'+data.msg_content+'</span></dt>')
+		.append('<dd data-param="{\'msgid\':\''+data.msg_id+'\',\'fname\':\''+data.from_member_name+'\'}"><span class="time">{$Think.lang.sns_just}</span><span class="handle"><a href="javascript:void(0);"onclick="ajax_get_confirm(\'{$Think.lang.ds_common_op_confirm}\', \'{$Think.HOME_SITE_URL}Membermessage/dropcommonmsg.html?drop_type=sns_msg&message_id='+data.msg_id+'\');">{$Think.lang.ds_delete}</a></span></dd>')
+		.prependTo('div[dstype="message_list"]');
+	$('div[dstype="message_list"]').children('div').hide();
+}
+
+function replyMsgSuccess(data){
+	$('dd[dstype="replyform"]').remove();
+	var to = $('dl[dstype="dl'+data.message_parent_id+'"]').children('dd:last');
+	$('<dl class="re-content"></dl>')
+		.append('<dt><a href="{$Think.HOME_SITE_URL}/Membersnshome/index.html?mid='+data.from_member_id+'">'+data.from_member_name+'{$Think.lang.sns_reply}{$Think.lang.ds_colon}</a><span>'+data.msg_content+'</span></dt>')
+		.append('<dd data-param="{\'msgid\':\''+data.msg_id+'\'}"><span class="time">{$Think.lang.sns_just}</span></dd>')
+		.appendTo(to);
+}
+</script>

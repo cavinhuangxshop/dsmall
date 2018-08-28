@@ -1,0 +1,68 @@
+<script type="text/javascript">
+    $(function() {
+        $('#sns_album_class_form').validate({
+            errorLabelContainer: $('#warning'),
+            invalidHandler: function(form, validator) {
+                $('#warning').show();
+            },
+            submitHandler: function(form) {
+                ajaxpost('sns_album_class_form', '', '', 'onerror')
+            },
+            rules: {
+                name: {
+                    required: true,
+                    maxlength: 20
+                },
+                description: {
+                    maxlength: 100
+                },
+                sort: {
+                    digits: true
+                }
+            },
+            messages: {
+                name: {
+                    required: '{$Think.lang.album_class_add_name_null}',
+                    maxlength: '{$Think.lang.album_class_add_name_max}'
+                },
+                description: {
+                    maxlength: '{$Think.lang.album_class_add_des_max}'
+                },
+                sort: {
+                    digits: '{$Think.lang.album_class_add_sort_digits}'
+                }
+            }
+        });
+    });
+</script>
+
+<div class="eject_con">
+    <div id="warning"></div>
+    <form id="sns_album_class_form" method="post" target="_parent" action="{:url('Snsalbum/album_edit_save')}">
+        <input type="hidden" name="id" value="{$class_info.ac_id}" />
+        <dl>
+            <dt class="required"><em class="pngFix"></em>{$Think.lang.album_class_add_name}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w300 text" type="text" name="name" id="name" value="{$class_info.ac_name}" />
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.album_class_add_des}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <textarea rows="3" class="w300" name="description" id="description">{$class_info.ac_des}</textarea>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.album_class_add_sort}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input type="text" class="text w50" name="sort" id="sort" value="{$class_info.ac_sort}" />
+            </dd>
+        </dl>
+        <dl class="bottom">
+            <dt>&nbsp;</dt>
+            <dd>
+                <input type="submit" class="submit" value="{$Think.lang.album_class_add_submit}" />
+            </dd>
+        </dl>
+    </form>
+</div>

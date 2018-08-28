@@ -1,0 +1,49 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w30"></th>
+            <th class="w180 tl">模板名称</th>
+            <th class="w180 tl">物流公司</th>
+            <th class="tl">运单图例</th>
+            <th class="w180">模板类型</th>
+            <th class="w110">{$Think.lang.ds_common_button_operate}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {if $waybill_list}
+        {foreach name="waybill_list" item="waybill"}
+        <tr class="bd-line">
+            <td></td>
+            <td class="tl">{$waybill.waybill_name}</td>
+            <td class="tl">{$express_info.express_name}</td>
+            <td class="tl"><div class="waybill-img-thumb"><a data-lightbox="lightbox-image" href="{$waybill.waybill_image_url}"><img src="{$waybill.waybill_image_url}"></a></div>
+                <div class="waybill-img-size">
+                    <p>宽度：{$waybill.waybill_width}(mm)</p>
+                    <p>高度：{$waybill.waybill_height}(mm)</p>
+                </div></td>
+            <td>{$waybill.waybill_type_text}</td>
+            <td class="nscs-table-handle"><span><a href="{:url('Sellerwaybill/waybill_test',array('waybill_id' => $waybill.waybill_id))}" class="btn-acidblue" target="_blank">
+                        <p>测试</p>
+                    </a></span><span><a href="{:url('Sellerwaybill/waybill_bind_save',array('waybill_id' =>$waybill.waybill_id,'express_id'=>$express_info.express_id))}"class="btn-green" >
+                        <p>绑定</p>
+                    </a></span></td>
+        </tr>
+        {/foreach}
+        {else}
+        <tr>
+            <td colspan="20" class="norecord"><div class="warning-option"><i class="fa fa-warning"></i><span>还没有可用的运单模板，<a href="{:url('Sellerwaybill/waybill_add')}">去建立模板</a></span></div></td>
+        </tr>
+        {/if}
+    </tbody>
+</table>
+<form id="bind_form" action="{:url('Sellerwaybill/waybill_bind_save')}" method="post">
+    <input type="hidden" name="express_id" value="{$express_info.express_id}">
+    <input type="hidden" id="waybill_id" name="waybill_id" value="">
+</form>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/css/lightbox.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/js/lightbox.min.js"></script>
+{/block}
+

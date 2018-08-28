@@ -1,0 +1,87 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_btn"}
+{present name="isPlatformStore"}
+{else /}
+{notempty name="current_mgdiscount_quota"}
+<a class="dssc-btn dssc-btn-acidblue" href="{:url('Sellerpromotionmgdiscount/mgdiscount_quota_add')}" title=""><i class="fa fa-money"></i>套餐续费</a>
+{else }
+<a class="dssc-btn dssc-btn-acidblue" href="{:url('Sellerpromotionmgdiscount/mgdiscount_quota_add')}" title=""><i class="fa fa-money"></i>{$Think.lang.mgdiscount_quota_add}</a>
+{/notempty}
+{/present}
+{/block}
+
+{block name="seller_main"}
+{present name="isPlatformStore"}
+<div class="alert alert-block mt10">
+    <ul>
+        <li>1、点击添加活动按钮可以添加会员等级折扣活动，点击管理按钮可以对会员等级折扣活动内的商品进行管理</li>
+        <li>2、点击删除按钮可以删除会员等级折扣活动</li>
+    </ul>
+</div>
+{else }
+<div class="alert alert-block mt10">
+    {notempty name="current_mgdiscount_quota"}
+    <strong>套餐过期时间{$Think.lang.ds_colon}</strong><strong style="color:#F00;">{$current_mgdiscount_quota.mgdiscountquota_endtime|date="Y-m-d H:i:s",###}</strong>
+    {else /}
+    <strong>当前没有可用套餐，请先购买套餐</strong>
+    {/notempty}
+    <ul>
+        <li>{$Think.lang.mgdiscount_explain1}</li>
+        <li>{$Think.lang.mgdiscount_explain2}</li>
+        <li>{$Think.lang.mgdiscount_explain3}</li>
+        <li>4、<strong style="color: red">相关费用会在店铺的账期结算中扣除</strong>。</li>
+    </ul>
+</div>
+{/present}
+
+
+
+
+<div class="dssc-form-default">
+    <form id="add_form" action="" method="post" enctype="multipart/form-data">
+        <dl>
+            <dt><i class="required">*</i>是否开启会员折扣</dt>
+            <dd>
+                <input type="radio" name="store_mgdiscount_state" value="0" {if $store.store_mgdiscount_state==0}checked{/if}/>
+                       <label>否</label>
+                <input type="radio" name="store_mgdiscount_state" value="1" {if $store.store_mgdiscount_state==1}checked{/if}/>
+                       <label>是</label>
+            </dd>
+        </dl>
+        {foreach name="mgdiscount_store_arr" item="v" key="k" }
+        <dl>
+            <dt><i class="required">*</i>{$v.level_name}</dt>
+            <dd>
+                <input class="w60 text" name="mgdiscount_store[{$k}][level_discount]" type="text"  value="{$v.level_discount|default=''}" maxlength="30"  />
+                <span>折</span>
+                <p class="hint">数值为0.1至10之间,设置为10表示不享受折扣</p>
+            </dd>
+        </dl>
+        {/foreach}
+        <div class="bottom">
+            <label class="submit-border">
+                <input type="submit" class="submit" value="{$Think.lang.ds_submit}">
+            </label>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        $('#add_form').validate({
+            errorPlacement: function (error, element) {
+                var error_td = element.parents('dd');
+                error_td.append(error);
+            },
+            submitHandler: function (form) {
+                ajaxpost('add_form', '', '', 'onerror')
+            },
+            rules: {
+            },
+            messages: {
+            }
+        });
+    });
+</script>
+
+{/block}

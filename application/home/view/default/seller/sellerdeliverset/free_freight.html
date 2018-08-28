@@ -1,0 +1,58 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<div class="dssc-form-default">
+            <form method="post"  action="{:url('Sellerdeliverset/free_freight')}" id="my_store_form">
+                <dl>
+                    <dt>免运费额度{$Think.lang.ds_colon}</dt>
+                    <dd>
+                        <input class="text w60" name="store_free_price" maxlength="10" type="text"  id="store_free_price" value="{$store_free_price}" /><em class="add-on">
+                            <i class="fa fa-cny"></i>
+                        </em>
+                        <p class="hint">默认为 0，表示不设置免运费额度，大于0表示购买金额超出该值后将免运费</p>
+                    </dd>
+                    <dt>预计配送到达时间{$Think.lang.ds_colon}</dt>
+                    <dd>
+                        <input class="text w60" name="store_free_time" maxlength="10" type="text"  id="store_free_time" value="{$store_free_time}" /><em class="add-on">
+                            天</em>
+                        <p class="hint">默认为2天，填写0，表示默认不显示，建议填写数值为3天或7天</p>
+                    </dd>
+                </dl>
+                <div class="bottom">
+                    <label class="submit-border"><input type="submit" class="submit" value="{$Think.lang.ds_common_button_save}" /></label>
+                </div>
+            </form>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                $('#my_store_form').validate({
+                    submitHandler: function(form) {
+                        ajaxpost('my_store_form', '', '', 'onerror');
+                    },
+                    rules: {
+                        store_free_price: {
+                            required: true,
+                            number: true
+                        },
+                        store_free_time: {
+                            required: true,
+                            digits: true
+                        },
+                    },
+                    messages: {
+                        store_free_price: {
+                            required: '请填写金额',
+                            number: '请正确填写'
+                        },
+                        store_free_time: {
+                            required: '请填写天数',
+                            digits: '请正确填写，只能整数'
+                        }
+                    }
+                });
+
+            });
+        </script> 
+
+
+{/block}
+

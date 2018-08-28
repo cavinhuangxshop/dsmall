@@ -1,0 +1,39 @@
+  <div id="account" class="double">
+    <div class="outline">
+      <div class="user-account">
+        <ul>
+          <li id="pre-deposit"><a href="{:url('Predeposit/pd_log_list')}" title="查看我的余额">
+            <h5>{$Think.lang.ds_predepositnum}</h5>
+            <span class="icon fa fa-database"></span> <span class="value">￥<em>{$member_info.available_predeposit}</em></span></a> </li>
+          <li id="voucher"><a href="{:url('Membervoucher/index')}" title="查看我的代金券">
+            <h5>代金券</h5>
+            <span class="icon fa fa-credit-card-alt"></span> <span class="value"><em>{$home_member_info.voucher_count|default='0'}</em>张</span></a> </li>
+          <li id="points"><a href="{:url('Memberpoints/index')}" title="查看我的积分">
+            <h5>{$Think.lang.ds_pointsnum}</h5>
+            <span class="icon fa fa-github"></span> <span class="value"><em>{$member_info.member_points}</em>分</span></a> </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="security" class="normal">
+    <div class="outline">
+        <div class="SAM">
+            <h5>账户安全</h5>
+            {if $home_member_info['security_level'] <= 1}
+            <div id="low" class="SAM-info"><strong>低</strong><i><span><em></em></span></i>
+                {elseif $home_member_info['security_level'] == 2 /}
+                <div id="normal" class="SAM-info"><strong>中</strong><i><span><em></em></span></i>
+                    {else/}
+                    <div id="high" class="SAM-info"><strong>高</strong><i><span><em></em></span></i>
+                        {/if}
+                        {if $home_member_info['security_level'] < 3}
+                        <a href="{:url('Membersecurity/index')}" title="安全设置">提升></a>
+                        {/if}
+                    </div>
+                    <div class="SAM-handle">
+                        <span><i class="fa fa-mobile mobile"></i>手机：{if $home_member_info['member_mobilebind'] == 1}<em>已绑定</em>{else/}<a href="{:url('Membersecurity/auth',['type'=>'modify_mobile'])}" title="绑定手机">未绑定</a>{/if}</span>
+                        <span><i class="mail fa fa-envelope-o"></i>邮箱：{if $home_member_info['member_emailbind'] == 1}<em>已绑定</em>{else/}<a href="{:url('Membersecurity/auth',['type'=>'modify_email'])}" title="绑定邮箱">未绑定</a>{/if}</span>
+                    </div>
+                </div>
+            </div>
+        </div>

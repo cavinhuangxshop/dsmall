@@ -1,0 +1,214 @@
+{extend name="default/base/base_sns" /}
+{block name="sns_main"}
+
+
+
+<style type="text/css">
+.ds-carousel-container { width: 640px; margin: 10px 0;}
+.ds-carousel-container li { width: 160px; height: 160px;}
+.ds-carousel-container .goods-pic { width: 160px; height: 160px;}
+.ds-carousel-container .goods-pic a { line-height: 0; background-color: #FFF; text-align: center; vertical-align: middle; display: table-cell; *display: block; width: 160px; height: 160px; overflow: hidden;}
+.ds-carousel-container .goods-pic a img { max-width: 160px; max-height: 160px; margin-top:expression(160-this.height/2); *margin-top:expression(80-this.height/2)/*IE6,7*/;}
+</style>
+<div class="sidebar">
+{include file='default/sns/membersnshome/sns_sidebar_visitor'/}
+{include file='default/sns/membersnshome/sns_sidebar_messageboard'/}
+</div>
+<div class="left-content">
+  <!-- 分享商品 START -->
+  {notempty name="goodslist"}
+  <div class="tabmenu">
+    <ul class="tab">
+      <li class="active"><a href="{:url('Membersnshome/shareglist',['mid'=>$master_id])}">{if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_share_of_goods}</a></li>
+    </ul><span class="more"><a href="{:url('Membersnshome/shareglist',['mid'=>$master_id])}">{$Think.lang.ds_more}</a></span>
+  </div>
+  <ul class="sns-home-share">
+    {foreach name="goodslist" item="v" key="k" }
+    <li id="recordone_{$v.sharegoods_id}"><a href="{:url('Membersnshome/goodsinfo',['mid'=>$v.sharegoods_memberid,'id'=>$v.sharegoods_id])}" title="{$v.snsgoods_goodsname}" class="pic" style=" background-image:url({:goods_cthumb($v['snsgoods_goodsimage'],240,$v['snsgoods_storeid'])})"> </a>
+      <p class="pinterest-cmt">{$v.sharegoods_content}</p>
+      <div class="ops">
+          <span class="ops-like" id="likestat_{$v.sharegoods_goodsid}"> <a href="javascript:void(0);" ds_type="likebtn" data-param='{"gid":"{$v.sharegoods_goodsid}"}' class="{if isset($v.snsgoods_havelike) && $v.snsgoods_havelike=='1'}noaction{/if}"><i class="{if isset($v.snsgoods_havelike) && $v.snsgoods_havelike=='1'}noaction{/if} pngFix"></i>{$Think.lang.sns_like}</a>
+              <em ds_type="likecount_{$v.sharegoods_goodsid}">{$v.snsgoods_likenum}</em>
+          </span>
+          <span class="ops-comment"><a href="{:url('Membersnshome/goodsinfo',['mid'=>$v.sharegoods_memberid,'id'=>$v.sharegoods_id])}" title="{$Think.lang.sns_comment}"><i class="pngFix"></i></a><em>{$v.sharegoods_commentcount}</em> </span>
+      </div>
+    </li>
+    {/foreach}
+  </ul>
+  {/notempty}
+  <!-- 分享商品 END -->
+  <!-- 分享图片 START -->
+  {notempty name="pic_list"}
+  <div class="tabmenu">
+    <ul class="tab">
+      <li class="active"><a href="{:url('Snsalbum/index',['mid'=>$master_id])}">{if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_of_album}</a></li>
+    </ul><span class="more"><a href="{:url('Snsalbum/index',['mid'=>$master_id])}">{$Think.lang.ds_more}</a></span>
+  </div>
+  <ul class="sns-home-album" >
+    {foreach name="pic_list" item="v" key="k" }
+    <li><a data-lightbox="lightbox-image" data-title="上传于:{$v.ap_uploadtime|date='Y-m-d',###}" href="{:get_snsalbumpic($master_id,$v['ap_cover'])}" style="background-image:url({:get_snsalbumpic($master_id,$v['ap_cover'])})"> </a>
+      <p>{$Think.lang.sns_upload_time}{$Think.lang.ds_colon}{$v.ap_uploadtime|date="Y-m-d",###}</p>
+    </li>
+    {/foreach}
+  </ul>
+  {/notempty}
+  <!-- 分享图片 END -->
+  <!-- 分享店铺 START -->
+  {notempty name="storelist"}
+  <div class="tabmenu">
+    <ul class="tab">
+      <li class="active"><a href="{:url('Membersnshome/storelist',['mid'=>$master_id])}">{if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_share_of_store}</a></li>
+    </ul>
+    <span class="more"><a href="{:url('Membersnshome/storelist',['mid'=>$master_id])}">{$Think.lang.ds_more}</a></span>
+  </div>
+  <div class="sns-home-store">
+    <ul>
+      {foreach name="storelist" item="v" key="k" }
+      <li id="recordone_{$v.sharestore_id}">
+        <dl>
+          <dt>
+            <h3><a href="javascript:void(0)">{$v.sharestore_membername}</a>{$v.sharestore_addtime|date="Y-m-d",###}</h3>
+          </dt>
+          <dd><i class="pngFix"></i>
+            <p>{if $v.sharestore_content !=''}{$Think.lang.sns_shared_the_shop}{/if}<i class="pngFix"></i></p>
+          </dd>
+          <div class="clear">&nbsp;</div>
+        </dl>
+        <div class="shop-content">
+          <div class="arrow pngFix">&nbsp;</div>
+          <div class="info">
+            <div class="title"><a title="{$v.store_name}" href="{:url('Store/index',['store_id'=>$v['store_id']])}"><i class="ico" ></i>{$v.store_name}</a>
+            </div>
+          </div>
+          <div class="detail">
+              {notempty name="$v.goods"}
+              <ul ds_type="mycarousel" class="ds-carousel-skin">
+                  {foreach name="$v.goods" item="g_v" key="g_k" }
+                  <li><div class="goods-pic"><a href="{$g_v.goodsurl}" target="_blank" title="{$g_v.goods_name}"><img alt="{$g_v.goods_name}" src="{:goods_thumb($g_v,240)}" /></a></div></li>
+                  {/foreach}
+              </ul>
+            {/notempty}
+          </div>
+          <div style="clear: both;"></div>
+        </div>
+      </li>
+      {/foreach}
+    </ul>
+  </div>
+  {/notempty}
+  <!-- 分享店铺 END -->
+  <!-- 新鲜事 START -->
+  {notempty name="tracelog_list"}
+  <div class="tabmenu">
+    <ul class="tab">
+      <li class="active"><a href="{:url('Membersnshome/trace',['mid'=>$master_id])}">{if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_of_fresh_news}</a></li>
+    </ul><span class="more"><a href="{:url('Membersnshome/trace',['mid'=>$master_id])}">{$Think.lang.ds_more}</a></span>
+  </div>
+  <ul class="fd-list" id="friendtrace">
+    {foreach name="tracelog_list" item="v" key="k" }
+    <li ds_type="tracerow_{$v.tracelog_id}">
+      <dl class="fd-wrap">
+        <dt><img src="{:get_member_avatar_for_id($v['tracelog_memberid'])}"  data-param="{'id':{$v.tracelog_memberid}}" dstype="mcard">
+        <h3><a href="{:url('Membersnshome/index',['mid'=>$v.tracelog_memberid])}" target="_blank" data-param="{'id':{$v.tracelog_memberid}}" dstype="mcard">{$v.tracelog_membername}{$Think.lang.ds_colon}</a>{:parsesmiles($v['tracelog_title'])}</h3>
+        </dt>
+        <dd>
+          {if $v.tracelog_originalid>0 || $v.tracelog_from ==2}
+          <div class="fd-forward">
+            {if $v.tracelog_originalstate == 1}
+            {$Think.lang.sns_trace_originaldeleted}
+            {else/}
+            {:parsesmiles($v['tracelog_content'])}
+            {if $v.tracelog_from =='shop'}
+            <div class="stat"><span>{$Think.lang.sns_original_forward}{if $v.tracelog_orgcopycount>0}({$v['tracelog_orgcopycount']}){/if}</span>&nbsp;&nbsp; 
+                <span>
+                    <a href="{:url('Membersnshome/traceinfo',['mid'=>$v.tracelog_originalmemberid,'id'=>$v.tracelog_originalid])}" target="_blank">{$Think.lang.sns_original_comment}{if $v.tracelog_orgcommentcount>0}{$v['tracelog_orgcommentcount']}{/if}</a>
+                </span>
+            </div>
+            {/if}
+            {/if}
+          </div>
+          {else/}
+          {:parsesmiles($v['tracelog_content'])}
+          {/if}
+        </dd>
+        <dd>
+          <span class="goods-time fl">{$v.tracelog_addtime|date='Y-m-d H:i',###}</span>
+          <span class="fl ml10">{:sns_share_from($v['tracelog_from'])}</span>
+          <span class="fr"><a href="javascript:void(0);" ds_type="fd_forwardbtn" data-param='{"txtid":"{$v.tracelog_id}"}'>{$Think.lang.sns_forward}</a>&nbsp;|&nbsp;<a href="javascript:void(0);" ds_type="fd_commentbtn" data-param='{"txtid":"{$v.tracelog_id}","mid":"{$v.tracelog_memberid}"}'>{$Think.lang.sns_comment}{if $v.tracelog_commentcount>0}{$v['tracelog_commentcount']}{/if}</a></span>
+        </dd>
+        <!-- 评论模块start -->
+        <div id="tracereply_{$v.tracelog_id}" style="display:none;"></div>
+        <!-- 评论模块end -->
+        <!-- 转发模块start -->
+        <div id="forward_{$v.tracelog_id}" style="display:none;">
+          <div class="forward-widget">
+            <div class="forward-edit">
+                <form id="forwardform_{$v.tracelog_id}" method="post" action="{:url('Membersnsindex/addforward',['type'=>$type,'irefresh'=>1])}">
+                <input type="hidden" name="originaltype" value="0"/>
+                <input type="hidden" name="originalid" value="{$v.tracelog_id}"/>
+                <div class="forward-add">
+                  <textarea resize="none" id="content_forward{$v.tracelog_id}" name="forwardcontent">{$v.tracelog_title_forward}</textarea>
+                  <span class="error"></span>
+                  <!-- 验证码 -->
+                  <div id="forwardseccode{$v.tracelog_id}" class="seccode" style="display: none;">
+                    <label for="captcha">{$Think.lang.ds_checkcode}{$Think.lang.ds_colon}</label>
+                    <input name="captcha" class="text" type="text" size="4" maxlength="4"/>
+                    <img src="" title="{$Think.lang.wrong_checkcode_change}" name="codeimage" onclick="this.src='{:captcha_src()}'"/> <span>{$Think.lang.wrong_seccode}</span>
+                  </div>
+                  <input type="text" style="display:none;" />
+                  <!-- 防止点击Enter键提交 -->
+                  <div class="act"> <span class="skin-blue"><span class="btn"><a href="javascript:void(0);" ds_type="forwardbtn" data-param='{"txtid":"{$v.tracelog_id}"}'>{$Think.lang.sns_forward}</a></span></span> <span id="forwardcharcount{$v.tracelog_id}" style="float:right;"></span> <a class="face" ds_type="smiliesbtn" data-param='{"txtid":"forward{$v.tracelog_id}"}' href="javascript:void(0);" >{$Think.lang.sns_smiles}</a> </div>
+                </div>
+              </form>
+            </div>
+            <ul class="forward-list">
+            </ul>
+          </div>
+        </div>
+        <!-- 转发模块end -->
+        <div class="clear"></div>
+      </dl>
+    </li>
+    {/foreach}
+  </ul>
+  {/notempty}
+  <!-- 新鲜事 END -->
+  <!-- 为空提示 START -->
+  {if empty($goodslist) && empty($pic_list) && empty($storelist) && empty($tracelog_list)}
+  <div class="sns-norecord"><i class="store-ico pngFix"></i>
+      <span>{$Think.lang.sns_regrettably}<br />
+          {if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_of_sns_without_any_share}
+      </span>
+  </div>
+  {/if}
+  <!-- 为空提示 END -->
+</div>
+<div class="clear"></div>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.ajaxdatalazy.js" charset="utf-8"></script>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/css/lightbox.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/js/lightbox.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	//图片轮换
+    jQuery('.sns-home-store .detail').slide({mainCell:"[ds_type='mycarousel']",effect:"left",autoPlay:true,vis:4});
+  	//删除分享的店铺
+	$("[ds_type='storedelbtn']").on('click',function(){
+		var data_str = $(this).attr('data-param');
+        eval( "data_str = "+data_str);
+        showDialog('{$Think.lang.ds_common_op_confirm}','confirm', '', function(){
+        	ajax_get_confirm('',HOMESITEURL+'/Membersnsindex/delstore.html?id='+data_str.sid);
+			return false;
+		});
+	});
+});
+</script>
+
+
+
+
+
+
+
+
+{/block}

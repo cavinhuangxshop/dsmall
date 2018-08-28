@@ -1,0 +1,104 @@
+{extend name="default/base/base_sns" /}
+{block name="sns_main"}
+
+
+<div class="left-content">
+<ul class="fd-list">
+  {notempty name="traceinfo"}
+  <li ds_type="tracerow_{$traceinfo.tracelog_id}">
+    <dl class="fd-wrap">
+      <dt>
+      <a href="{:url('Membersnshome/index',['mid'=>$traceinfo.tracelog_memberid])}" target="_blank">
+          <img src="{$Think.UPLOAD_SITE_URL}/{if $traceinfo.tracelog_memberavatar!=''}{$Think.ATTACH_AVATAR}/{$traceinfo.tracelog_memberavatar}{else/}{$Think.ATTACH_COMMON}/{$Think.config.default_user_portrait}{/if}">
+      </a>
+        <h3><a href="{:url('Membersnshome/index',['mid'=>$traceinfo.tracelog_memberid])}" target="_blank">{$traceinfo.tracelog_membername}{$Think.lang.ds_colon}</a>{:parsesmiles($traceinfo['tracelog_title'])}</h3>
+        {if (session('member_id') == $traceinfo['tracelog_memberid'])}
+        <div class="del-btn fr" title="{$Think.lang.ds_delete}"><a href="javascript:void(0);" ds_type="fd_del" data-param='{"txtid":"{$traceinfo.tracelog_id}"}'><i></i>&nbsp;</a></div>
+        {/if}
+      </dt>
+      <dd>
+        {if $traceinfo.tracelog_content !=''}
+        {if $traceinfo.tracelog_originalid>0 || $traceinfo.tracelog_from!=1}
+        <!--转帖内容-->
+        <div class="fd-forward">{:parsesmiles($traceinfo['tracelog_content'])}</div>
+        {if $traceinfo.tracelog_from == 1}
+        <div class="stat"> 
+            <span>{$Think.lang.sns_original_forward}
+                {if $traceinfo.tracelog_orgcopycount>0}({$traceinfo['tracelog_orgcopycount']}){/if}
+            </span>
+            &nbsp;&nbsp; 
+            <span>
+                <a href="{:url('Membersnshome/traceinfo',['mid'=>$traceinfo.tracelog_originalmemberid,'id'=>$traceinfo.tracelog_originalid])}" target="_blank">
+                    {$Think.lang.sns_original_comment}
+                    {if $traceinfo.tracelog_orgcommentcount>0}({$traceinfo['tracelog_orgcommentcount']}){/if}
+                </a>
+            </span> 
+        </div>
+        {/if}
+        {else/}
+        {:parsesmiles($traceinfo['tracelog_content'])}
+        {/if}
+        {/if}
+      </dd>
+      <dd>
+        <span class="goods-time fl">{$traceinfo.tracelog_addtime|date="Y-m-d H:i",###}</span>
+          <span class="fl ml10">{:sns_share_from($traceinfo['tracelog_from'])}</span>
+          <span class="fr">
+              <a href="javascript:void(0);" ds_type="fd_forwardbtn" data-param='{"txtid":"{$traceinfo.tracelog_id}"}'>{$Think.lang.sns_forward}</a>&nbsp;|&nbsp;
+              <a href="javascript:void(0);" ds_type="fd_commentbtn" data-param='{"txtid":"{$traceinfo.tracelog_id}","mid":"{$traceinfo.tracelog_memberid}"}'>
+                 {$Think.lang.sns_comment}{if $traceinfo.tracelog_commentcount>0}({$traceinfo['tracelog_commentcount']}){/if}
+          </a>
+      </span>
+      </dd>
+      <!-- 评论模块start -->
+      <div id="tracereply_{$traceinfo.tracelog_id}"></div>
+      <!-- 评论模块end --> 
+      <!-- 转发模块start -->
+      <div id="forward_{$traceinfo.tracelog_id}" style="display:none;">
+        <div class="forward-widget">
+          <div class="forward-edit">
+            <form id="forwardform_{$traceinfo.tracelog_id}" method="post" action="{:url('Membersnsindex/addforward')}">
+              <input type="hidden" name="originaltype" value="0"/>
+              <input type="hidden" name="originalid" value="{$traceinfo.tracelog_id}"/>
+              <div class="forward-add">
+                <div class="textarea-b">
+                  <textarea resize="none" id="content_forward{$traceinfo.tracelog_id}" name="forwardcontent">{$traceinfo.tracelog_title_forward}</textarea>
+                  <span class="error"></span> </div>
+                <!-- 验证码 -->
+                <div id="forwardseccode{$traceinfo.tracelog_id}" class="seccode" style="display: none;">
+                  <label for="captcha">{$Think.lang.ds_checkcode}{$Think.lang.ds_colon}</label>
+                  <input name="captcha" class="text" type="text" size="4" maxlength="4"/>
+                  <img src="" title="{$Think.lang.wrong_checkcode_change}" name="codeimage" onclick="this.src='{:captcha_src()}'"/> <span>{$Think.lang.wrong_seccode}</span>
+                </div>
+                <input type="text" style="display:none;" />
+                <!-- 防止点击Enter键提交 -->
+                <div class="act"> <span class="skin-blue"><span class="btn"><a href="javascript:void(0);" ds_type="forwardbtn" data-param='{"txtid":"{$traceinfo.tracelog_id}"}'>{$Think.lang.sns_forward}</a></span></span> <span id="forwardcharcount{$traceinfo.tracelog_id}" style="float:right;"></span> <a class="face" ds_type="smiliesbtn" data-param='{"txtid":"forward{$traceinfo.tracelog_id}"}' href="javascript:void(0);" >{$Think.lang.sns_smiles}</a> </div>
+              </div>
+            </form>
+          </div>
+          <ul class="forward-list">
+          </ul>
+        </div>
+      </div>
+    </dl>
+    <!-- 转发模块end -->
+    <div id="smilies_div" class="smilies-module"></div>
+  </li>
+  {else /}
+  <li>
+    <div class="sns-norecord">{$Think.lang.sns_trace_deleted}</div>
+  </li>
+  {/notempty}
+</ul>
+</div>
+<div class="clear"></div>
+<script type="text/javascript">
+document.onclick = function(){ $("#smilies_div").html(''); $("#smilies_div").hide();};
+$(function(){
+	$('#tracereply_{$traceinfo.tracelog_id|default="0"}').load('{$Think.HOME_SITE_URL}/Membersnshome/commentlist.html?mid={$traceinfo.tracelog_memberid|default="0"}&type=0&id={$traceinfo.tracelog_id|default="0"}');
+});
+</script>
+
+
+
+{/block}

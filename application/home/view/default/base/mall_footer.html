@@ -1,0 +1,33 @@
+{if $Think.config.node_site_use eq '1' && !isset($wait)}
+{:get_chat()}
+{/if}
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.cookie.js"></script>
+<script src="{$Think.HOME_SITE_ROOT}/js/compare.js"></script>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/perfect-scrollbar.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/qtip/jquery.qtip.min.js"></script>
+<link href="{$Think.PLUGINS_SITE_ROOT}/js/qtip/jquery.qtip.min.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.lazyload.min.js"></script>
+<script>
+    //懒加载
+    $("img.lazyload").lazyload({
+//        placeholder : "{$Think.HOME_SITE_ROOT}/images/loading.gif",
+        effect: "fadeIn",
+        threshold : 200,
+    });
+</script>
+<div class="footer-info">
+    <div class="links w1200">
+        <a href="http://www.csdeshang.com/" target="_blank">关于我们</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">联系我们</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">商家入驻</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">营销中心</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">手机商城</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">友情链接</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">销售联盟</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">商城社区</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">商城公益</a>|
+        <a href="http://www.csdeshang.com/" target="_blank">English Site</a>
+    </div>
+    <p class="copyright">{$Think.config.flow_static_code}</p>
+</div>

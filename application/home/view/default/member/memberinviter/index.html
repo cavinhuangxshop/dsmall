@@ -1,0 +1,42 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+
+
+
+
+<div>
+    <p class="link p15">
+        <span class="label">邀请注册链接：</span>
+        <span>
+            <b id="foo">{$inviter_url}</b>   <a class="artdilog_btn" id="copyurlbt" data-clipboard-action="copy" data-clipboard-target="#foo" >复制</a>
+        </span>
+    </p>
+    <p class="link p15">
+        <span class="label">推广公众号二维码：</span>
+        {if $refer_qrcode_weixin}<img src="{$refer_qrcode_weixin}" style='vertical-align: top' width='150' />{else}生成二维码失败{$wx_error_msg}{/if}
+    </p>
+    <p class="link p15">
+        <span class="label">推广注册海报：</span>
+        <img src="{$refer_qrcode_logo}" style='vertical-align: top'/>
+    </p>
+</div>
+
+
+
+<script src="{$Think.PLUGINS_SITE_ROOT}/clipboard.min.js"></script>
+<script>
+$(function(){
+    var clipboard = new Clipboard('#copyurlbt');
+
+    clipboard.on('success', function(e) {
+        alert('复制链接成功！')
+    });
+
+})
+</script>
+
+
+
+
+{/block}
+

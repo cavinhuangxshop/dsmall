@@ -1,0 +1,268 @@
+{extend name="default/base/base_joinin" /}
+{block name="joinin_main"}
+
+<div class="breadcrumb"><span class="fa fa-home"></span><span><a href="{:url('Index/index')}">首页</a></span> <span class="arrow">></span> <span>商家入驻申请</span> </div>
+<div class="main">
+    <div class="sidebar">
+        <div class="title">
+            <h3>商家入驻申请</h3>
+        </div>
+        <div class="content">
+            <dl>
+                <dt class="{if $sub_step == 'step0'}current{/if}"> <i class="hide"></i>签订入驻协议</dt>
+            </dl>
+            <dl show_id="0">
+                <dt onclick="show_list('0');" style="cursor: pointer;"> <i class="show"></i>提交申请</dt>
+                <dd>
+                    <ul>
+                        <li class="{if $sub_step == 'step1'}current{/if}"><i></i>店铺资质信息</li>
+                        <li class="{if $sub_step == 'step2'}current{/if}"><i></i>财务资质信息</li>
+                        <li class="{if $sub_step == 'step3'}current{/if}"><i></i>店铺经营信息</li>
+                    </ul>
+                </dd>
+            </dl>
+            <dl>
+                <dt class="{if $sub_step == 'pay'}current{/if}"> <i class="hide"></i>合同签订及缴费</dt>
+            </dl>
+            <dl>
+                <dt> <i class="hide"></i>店铺开通</dt>
+            </dl>
+        </div>
+        <div class="title">
+            <h3>平台联系方式</h3>
+        </div>
+        <div class="content">
+            <ul>
+                <li>电话：{$Think.config.site_phone}</li>
+                <li>邮箱：{$Think.config.site_email}</li>
+            </ul> 
+        </div>
+    </div>
+    <div class="right-layout">
+        <div class="joinin-step">
+            <ul>
+                <li class="step1 {if $sub_step >= 'step0'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>签订入驻协议</span></li>
+                <li class="{if $sub_step >= 'step1'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>店铺资质信息</span></li>
+                <li class="{if $sub_step >= 'step2'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>财务资质信息</span></li>
+                <li class="{if $sub_step >= 'step3'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>店铺经营信息</span></li>
+                <li class="{if $sub_step >= 'step4'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>合同签订及缴费</span></li>
+                <li class="step6"><span>店铺开通</span></li>
+            </ul>
+        </div>
+        <div class="joinin-concrete">
+
+
+
+
+
+
+
+
+
+            
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/css/lightbox.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/js/lightbox.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $('#form_paying_money_certificate').validate({
+            errorPlacement: function(error, element){
+                element.nextAll('span').first().after(error);
+            },
+            rules : {
+                paying_money_certificate: {
+                    required: true
+                },
+                paying_money_certificate_explain: {
+                    maxlength: 100 
+                }
+            },
+            messages : {
+                paying_money_certificate: {
+                    required: '请选择上传付款凭证'
+                },
+                paying_money_certificate_explain: {
+                    maxlength: jQuery.validator.format("最多{0}个字")
+                }
+            }
+        });
+
+        $('#btn_paying_money_certificate').on('click', function() {
+            $('#form_paying_money_certificate').submit();
+        });
+
+    });
+</script>
+<div class="joinin-pay">  
+  <table border="0" cellpadding="0" cellspacing="0" class="store-joinin">
+    <thead>
+      <tr>
+        <th colspan="6">店铺及联系人信息</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>店铺名称：</th>
+        <td>{$joinin_detail.company_name}</td>
+
+        <th>所在地：</th>
+        <td>{$joinin_detail.company_address}</td>
+        <th>详细地址：</th>
+        <td>{$joinin_detail.company_address_detail}</td>
+      </tr>
+      <tr>
+        <th>联系人姓名：</th>
+        <td>{$joinin_detail.contacts_name}</td>
+        <th>联系人电话：</th>
+        <td>{$joinin_detail.contacts_phone}</td>
+        <th>电子邮箱：</th>
+        <td>{$joinin_detail.contacts_email}</td>
+      </tr>
+    </tbody>
+  </table>
+  <table border="0" cellpadding="0" cellspacing="0" class="store-joinin">
+    <thead>
+      <tr>
+        <th colspan="2">身份证信息</th>
+      </tr>
+    </thead>
+    <tbody>
+	  <tr>
+        <th>身份证姓名：</th>
+        <td colspan="20">{$joinin_detail.business_sphere}</td>
+      </tr>
+      <tr>
+        <th>身份证号码：</th>
+        <td>{$joinin_detail.business_licence_number}</td></tr>
+
+      <tr>
+        <th>身份证扫描件：</th>
+        <td colspan="20">
+            {notempty name="$joinin_detail.business_licence_number_electronic"}
+            <a data-lightbox="lightbox-image"  href="{:get_store_joinin_imageurl($joinin_detail['business_licence_number_electronic'])}"> <img src="{:get_store_joinin_imageurl($joinin_detail['business_licence_number_electronic'])}" alt="" /> </a>
+            {else /}
+            未上传
+            {/notempty}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <table border="0" cellpadding="0" cellspacing="0" class="store-joinin">
+    <thead>
+      <tr>
+        <th colspan="2">结算（支付宝）账号信息：</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>支付宝帐户名：</th>
+        <td>{$joinin_detail.settlement_bank_account_name}</td>
+      </tr>
+      <tr>
+        <th>支付宝账号：</th>
+        <td>{$joinin_detail.settlement_bank_account_number}</td>
+      </tr>
+    </tbody>
+    
+  </table>
+
+  <form id="form_paying_money_certificate" action="{:url('Sellerjoininc2c/pay_save')}" method="post" enctype="multipart/form-data">
+    <input id="verify_type" name="verify_type" type="hidden" />
+    <input name="member_id" type="hidden" value="{$joinin_detail.member_id}" />
+    <table border="0" cellpadding="0" cellspacing="0" class="store-joinin">
+      <thead>
+        <tr>
+          <th colspan="2">店铺经营信息</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+          <th>卖家帐号：</th>
+          <td>{$joinin_detail.seller_name}</td>
+        </tr>
+        <tr>
+          <th>店铺名称：</th>
+          <td>{$joinin_detail.store_name}</td>
+        </tr>
+        <tr>
+          <th>店铺等级：</th>
+          <td>{$joinin_detail.storegrade_name}</td>
+        </tr>
+        <tr>
+          <th>店铺分类：</th>
+          <td>{$joinin_detail.storeclass_name}</td>
+        </tr>
+        <tr>
+          <th>经营类目：</th>
+          <td><table border="0" cellpadding="0" cellspacing="0" id="table_category" class="type">
+              <thead>
+                <tr>
+                  <th>分类1</th>
+                  <th>分类2</th>
+                  <th>分类3</th>
+                  <th>比例</th>
+                </tr>
+              </thead>
+              <tbody>
+                {notempty name="$joinin_detail.store_class_names"}
+                {php}$store_class_names = unserialize($joinin_detail['store_class_names']);{/php}
+                {php}$store_class_commis_rates = explode(',', $joinin_detail['store_class_commis_rates']);{/php}
+                {notempty name="store_class_names"}
+                <?php for($i=0, $length = count($store_class_names); $i < $length; $i++) {?>
+                {php}@list($class1, $class2, $class3) = explode(',', $store_class_names[$i]);{/php}
+                <tr>
+                    <td>{$class1|default='0'}</td>
+                    <td>{$class2|default='0'}</td>
+                    <td>{$class3|default='0'}</td>
+                    <td>{$store_class_commis_rates[$i]}%</td>
+                </tr>
+                <?php } ?>
+                {/notempty}
+                {/notempty}
+              </tbody>
+            </table></td>
+        </tr>
+        <tr>
+          <th>审核意见：</th>
+          <td colspan="2">{$joinin_detail.joinin_message}</td>
+        </tr>
+      </tbody>
+    </table>
+      <table border="0" cellpadding="0" cellspacing="0" class="store-joinin">
+          <tbody><tr>
+              <th>上传付款凭证：</th>
+              <td>
+                  <input name="paying_money_certificate" type="file" /><span></span>
+              </td>
+          </tr>
+          <tr>
+              <th>备注：</th>
+              <td>
+                  <textarea name="paying_money_certificate_explain" rows="10" cols="30"></textarea>
+                  <span></span>
+              </td>
+          </tr></tbody>
+      </table>
+  </form>
+  <div class="bottom"><a id="btn_paying_money_certificate" href="javascript:;" class="btn">提交</a></div></div>
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+{/block}

@@ -1,0 +1,168 @@
+{include file="public/header" /}
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>买家动态</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form method="get" name="formSearch">
+        <div class="ds-search-form">
+            <dl>
+                <dt>{$Think.lang.admin_snstrace_membername}</dt>
+                <dd><input type="text" value="{$Request.get.search_uname}" name="search_uname" id="search_uname" class="txt"></dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.admin_snstrace_content}</dt>
+                <dd><input type="text" value="{$Request.get.search_content}" name="search_content" id="search_content" class="txt"></dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.admin_snstrace_state}</dt>
+                    <dd><select name="search_state">
+                            <option value=''>{$Think.lang.ds_please_choose}...</option>
+                            <option value="0" {$Request.get.search_state == '0'?'selected':''}>{$Think.lang.admin_snstrace_stateshow}</option>
+                            <option value="1" {$Request.get.search_state == '1'?'selected':''}>{$Think.lang.admin_snstrace_statehide}</option>
+                        </select>
+                    </dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.admin_snstrace_addtime}</dt>
+                <dd>
+                    <input type="text" class="txt date" value="{$Request.get.search_stime}" name="search_stime" id="search_stime" class="txt">
+                    ~
+                    <input type="text" class="txt date" value="{$Request.get.search_etime}" name="search_etime" id="search_etime" class="txt">
+                </dd>   
+            </dl>
+            <div class="btn_group">
+                <a href="javascript:document.formSearch.submit();" class="btn ">{$Think.lang.ds_query}&nbsp;</a>
+                {if $filtered}
+                <a href="{:url('Snstrace/index')}" class="btn btn-default" title="{$Think.lang.ds_cancel}">{$Think.lang.ds_cancel}</a>
+                {/if}
+            </div>
+        </div>
+    </form>
+    
+    <div class="explanation" id="explanation">
+        <div class="title" id="checkZoom">
+            <h4 title="{$Think.lang.ds_explanation_tip}">{$Think.lang.ds_explanation}</h4>
+            <span id="explanationZoom" title="{$Think.lang.ds_explanation_close}" class="arrow"></span>
+        </div>
+        <ul>
+            <li>{$Think.lang.admin_snstrace_tracelisttip1}</li>
+            <li>{$Think.lang.admin_snstrace_tracelisttip2}</li>
+        </ul>
+    </div>
+
+    
+    <form method='post' id="form_trace" action="">
+        <table class="ds-default-table">
+            <tbody>
+                {notempty name="tracelog_list"}
+                {foreach name="tracelog_list" item="v"}
+                
+                <tr class="hover edit">
+          <td style="vertical-align:top;"><input type="checkbox" name="t_id[]" value="{$v.tracelog_id}" class="checkitem"></td>
+          <td class="fd-list"><!-- 动态列表start -->
+            
+            <li>
+                <div class="fd-aside"> <span class="thumb size60"><a href="{:url('home/Membersnshome/index',['mid'=>$v.tracelog_memberid])}" target="_blank"> <img src="{:get_member_avatar_for_id($v['tracelog_memberid'])}" width="60" height="60"> </a> </span> </div>
+              <dl class="fd-wrap">
+                <dt>
+                  <h3><a href="{:url('home/Membersnshome/index',['mid'=>$v.tracelog_memberid])}" target="_blank">{$v.tracelog_membername}</a>{$Think.lang.ds_colon}</h3>
+                  <h5>{:parsesmiles($v['tracelog_title'])}</h5>
+                </dt>
+                <dd>
+                    {if $v['tracelog_content'] != ''}
+                    {if $v['tracelog_originalid'] > 0  && $v['tracelog_from'] == 1}
+                    <!--转帖内容-->
+                    <div class="fd-forward">
+                        {if $v['tracelog_originalstate'] == '1'}
+                        {$Think.lang.admin_snstrace_originaldeleted}
+                        {else /}
+                        {:parsesmiles($v['tracelog_content'])}
+                        <div class="stat">
+                            <span>{$Think.lang.admin_snstrace_forward}({$v.tracelog_orgcopycount|default=''})</span>&nbsp;&nbsp; 
+                            <span><a href="{:url('Snstrace/commentlist',['tid'=>$v.tracelog_originalid])}">{$Think.lang.admin_snstrace_comment}({$v.tracelog_orgcommentcount|default=''})</a></span> 
+                        </div>
+                        {/if}
+                    </div>
+                    {else/}
+                    {:parsesmiles($v['tracelog_content'])}
+                    {/if}
+                    {/if}
+                </dd>
+                <dd>
+                    <span class="fc-time fl">{$v.tracelog_addtime|date="Y-m-d H:i",###}</span>
+                    <span class="fr">{$Think.lang.admin_snstrace_forward}({$v.tracelog_copycount|default=''})&nbsp;|&nbsp;
+                        <a href="{:url('Snstrace/commentlist',['tid'=>$v.tracelog_id])}">{$Think.lang.admin_snstrace_comment}({$v.tracelog_commentcount|default=''})</a></span>
+                    <span class="fl">&nbsp;&nbsp;{$Think.lang.admin_snstrace_state}{$Think.lang.ds_colon}{if $v['tracelog_state']==1}<font style='color:red;'>{$Think.lang.admin_snstrace_statehide}</font>{else/}{$Think.lang.admin_snstrace_stateshow}{/if}</span>
+                    <span class="fl">&nbsp;&nbsp;{$Think.lang.admin_snstrace_privacytitle}{$Think.lang.ds_colon}
+                        {if $v['tracelog_privacy']=='1'}
+                        {$Think.lang.admin_snstrace_privacy_friend}
+                        {elseif $v['tracelog_privacy']=='2'/}
+                        {$Think.lang.admin_snstrace_privacy_self}
+                        {else /}
+                        {$Think.lang.admin_snstrace_privacy_all}
+                        {/if}
+                  </span>
+                </dd>
+                <div class="clear"></div>
+              </dl>
+            </li>
+            
+            <!-- 动态列表end --></td>
+        </tr>
+            {/foreach}
+            <tfoot>
+                <tr class="tfoot">
+                    <td class="w24"><input type="checkbox" class="checkall" id="checkallBottom"></td>
+                    <td colspan="16"><label for="checkallBottom">{$Think.lang.ds_select_all}</label>
+                        &nbsp;&nbsp; <a href="JavaScript:void(0);" class="btn btn-small" onclick="submit_form('del');"><span>{$Think.lang.ds_del}</span></a>
+                        <a href="JavaScript:void(0);" class="btn btn-small" onclick="submit_form('hide');"><span>{$Think.lang.admin_snstrace_statehide}</span></a>
+                        <a href="JavaScript:void(0);" class="btn btn-small" onclick="submit_form('show');"><span>{$Think.lang.admin_snstrace_stateshow}</span></a>
+                    </td>
+                </tr>
+            </tfoot>
+            {else /}
+            <tr class="no_data">
+                <td colspan="15">{$Think.lang.ds_no_record}</td>
+            </tr>
+            {/notempty}
+            </tbody>
+        </table>
+    </form>
+    {$show_page}
+
+</div>
+
+<script type="text/javascript">
+    $(function(){
+        $('#search_stime').datepicker({dateFormat: 'yy-mm-dd',onSelect:function(dateText,inst){
+            var year2 = dateText.split('-') ;
+            $('#search_etime').datepicker( "option", "minDate", new Date(parseInt(year2[0]),parseInt(year2[1])-1,parseInt(year2[2])+1) );
+        }});
+        $('#search_etime').datepicker({dateFormat: 'yy-mm-dd',onSelect:function(dateText,inst){
+            var year1 = dateText.split('-') ;
+            $('#search_stime').datepicker( "option", "maxDate", new Date(parseInt(year1[0]),parseInt(year1[1])-1,parseInt(year1[2])-1) );
+        }});
+    });
+    function submit_form(type){
+        if(type=='del'){
+            if(!confirm('{$Think.lang.ds_ensure_del}')){
+                return false;
+            }
+            $('#form_trace').attr('action','{:url('Snstrace/tracedel')}');
+        }else if(type=='hide'){
+            $('#form_trace').attr('action','{:url('Snstrace/traceedit','type=hide')}');
+        }else{
+            $('#form_trace').attr('action','{:url('Snstrace/traceedit','typr=show')}');
+        }
+        $('#form_trace').submit();
+    }
+</script>

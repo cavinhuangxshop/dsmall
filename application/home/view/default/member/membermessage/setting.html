@@ -1,0 +1,82 @@
+{extend name="default/base/base_member" /}
+{block name="member_btn"}
+            {if $isallowsend}
+            <a href="{:url('Membermessage/sendmsg')}" class="dsm-btn dsm-btn-orange" title="{$Think.lang.home_message_send_message}"><i class="fa fa-envelope-o"></i>{$Think.lang.home_message_send_message}</a>
+            {/if}
+{/block}
+{block name="member_main"}
+
+
+
+<div class="dsm-message-setting">
+    <form method="post" action="{:url('Membermessage/setting')}" id="setting_form" onsubmit="ajaxpost('setting_form', '', '', 'onerror');">
+        <dl>
+            <dt><span><i class="fa fa-shopping-cart"></i></span>订单交易通知</dt>
+            <dd>
+                <ul>
+                    <li>
+                        <input type="checkbox" name="order_payment_success" id="order_payment_success" value="1" {if $setting_array.order_payment_success}checked{/if} />
+                               <label for="order_payment_success">付款成功提示</label></li>
+                    <li>
+                        <input type="checkbox" name="order_deliver_success" id="order_deliver_success" value="1" {if $setting_array.order_deliver_success}checked{/if} />
+                               <label for="order_deliver_success">商品出库提示</label></li>
+                    <li>
+                        <input type="checkbox" name="vr_code_will_expire" id="vr_code_will_expire" value="1" {if $setting_array.vr_code_will_expire}checked{/if} />
+                               <label for="vr_code_will_expire">兑换码即将到期提醒</label></li>
+                </ul>
+            </dd>
+        </dl>
+        <dl>
+            <dt><span><i class="fa fa-money"></i></span>余额卡券提醒</dt>
+            <dd>
+                <ul>
+                    <li>
+                        <input type="checkbox" name="predeposit_change" id="predeposit_change" value="1" {if $setting_array.predeposit_change}checked{/if} />
+                               <label for="predeposit_change">余额变动提醒</label></li>
+                    <li>
+                        <input type="checkbox" name="recharge_card_balance_change" id="recharge_card_balance_change" value="1" {if $setting_array.recharge_card_balance_change}checked{/if} />
+                               <label for="recharge_card_balance_change">充值卡余额变动提醒</label></li>
+                    <li>
+                        <input type="checkbox" name="voucher_use" id="voucher_use" value="1" {if $setting_array.voucher_use}checked{/if} />
+                               <label for="voucher_use">代金券使用提醒</label></li>
+                    <li>
+                        <input type="checkbox" name="voucher_will_expire" id="voucher_will_expire" value="1" {if $setting_array.voucher_will_expire}checked{/if} />
+                               <label for="voucher_will_expire">代金券即将到期提醒</label></li>
+                </ul>
+            </dd>
+        </dl>
+        <dl>
+            <dt><span><i class="fa fa-coffee"></i></span>售后服务消息</dt>
+            <dd>
+                <ul>
+                    <li>
+                        <input type="checkbox" name="refund_return_notice" id="refund_return_notice" value="1" {if $setting_array.refund_return_notice}checked{/if} />
+                               <label for="refund_return_notice">退换货消息</label></li>
+                    <li>
+                        <input type="checkbox" name="arrival_notice" id="arrival_notice" value="1" {if $setting_array.arrival_notice}checked{/if} />
+                               <label for="arrival_notice">到货通知消息</label></li>
+                    <li>
+                        <input type="checkbox" name="consult_goods_reply" id="consult_goods_reply" value="1" {if $setting_array.consult_goods_reply}checked{/if} />
+                               <label for="consult_goods_reply">商品咨询回复提示</label></li>
+                    <li>
+                        <input type="checkbox" name="consult_mall_reply" id="consult_mall_reply" value="1" {if $setting_array.consult_mall_reply}checked{/if} />
+                               <label for="consult_mall_reply">平台咨询回复提示</label></li>
+                </ul>
+            </dd>
+        </dl>
+        <div class="bottom tc">
+            <label class="submit-border">
+                <input id="btn_inform_submit" type="submit" class="submit" value="保存更改" />
+            </label>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+{/block}

@@ -1,0 +1,98 @@
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns.js" charset="utf-8"></script>
+<div id="lazymodule">
+  {if count($tracelog_list)>0}
+  <ul class="fd-list">
+    {foreach name="tracelog_list" item="v" key="k" }
+    <li ds_type="tracerow_{$v.tracelog_id}">
+      <dl class="fd-wrap">
+        <dt>
+          <img src="{:get_member_avatar_for_id($v['tracelog_memberid'])}" data-param="{'id':{$v.tracelog_memberid}}" dstype="mcard">
+          <h3><a href="{:url('Membersnshome/index',['mid'=>$v.tracelog_memberid])}" target="_blank" data-param="{'id':{$v.tracelog_memberid}}" dstype="mcard">{$v.tracelog_membername}{$Think.lang.ds_colon}</a>{:parsesmiles($v['tracelog_title'])}</h3>
+          {if $Think.session.member_id==$v.tracelog_memberid}
+          <div class="del-btn fr"><a href="javascript:void(0);" ds_type="fd_del" data-param='{"txtid":"{$v.tracelog_id}"}'><i></i>&nbsp;</a></div>
+          {/if}
+        </dt>
+        <dd>
+          {if $v.tracelog_content !=''}
+          {if $v.tracelog_originalid>0 || $v.tracelog_from==2}
+          <div class="fd-forward">
+              {if $v.tracelog_originalstate == 1}
+              {$Think.lang.sns_trace_originaldeleted}
+              {else/}
+              {:parsesmiles($v['tracelog_content'])}
+              {if $v.tracelog_from == 1}
+              <div class="stat"><span>{$Think.lang.sns_original_forward}{if $v.tracelog_orgcopycount>0}({$v['tracelog_orgcopycount']}){/if}</span>&nbsp;&nbsp; 
+                  <span>
+                      <a href="{:url('Membersnshome/traceinfo',['mid'=>$v.tracelog_originalmemberid,'id'=>$v.tracelog_originalid])}" target="_blank">
+                          {$Think.lang.sns_original_comment}{if $v.tracelog_orgcommentcount>0}({$v['tracelog_orgcommentcount']}){/if}
+                      </a>
+                  </span>
+              </div>
+              {/if}
+              {/if}
+          </div>
+          {else/}
+          {:parsesmiles($v['tracelog_content'])}
+          {/if}
+          {/if}
+          
+        </dd>
+        <dd>
+          <span class="goods-time fl">{$v.tracelog_addtime|date='Y-m-d H:i',###}</span>
+          <span class="fl ml10">{:sns_share_from($v['tracelog_from'])}</span>
+          <span class="fr"><a href="javascript:void(0);" ds_type="fd_forwardbtn" data-param='{"txtid":"{$v.tracelog_id}"}'>{$Think.lang.sns_forward}</a>&nbsp;|&nbsp;
+              <a href="javascript:void(0);" ds_type="fd_commentbtn" data-param='{"txtid":"{$v.tracelog_id}","mid":"{$v.tracelog_memberid}"}'>
+                 {$Think.lang.sns_comment}{if $v.tracelog_commentcount>0}({$v['tracelog_commentcount']}){/if}
+          </a>
+          </span>
+        </dd>
+        <!-- 评论模块start -->
+        <div id="tracereply_{$v.tracelog_id}" style="display:none;"></div>
+        <!-- 评论模块end --> 
+        <!-- 转发模块start -->
+        <div id="forward_{$v.tracelog_id}" style="display:none;">
+          <div class="forward-widget">
+            <div class="forward-edit">
+                <form id="forwardform_{$v.tracelog_id}" method="post" action="{:url('Membersnsindex/addforward',['type'=>$type,'irefresh'=>'1'])}">
+                <input type="hidden" name="originaltype" value="0"/>
+                <input type="hidden" name="originalid" value="{$v.tracelog_id}"/>
+                <div class="forward-add">
+                  <textarea resize="none" id="content_forward{$v.tracelog_id}" name="forwardcontent">{$v.tracelog_title_forward}</textarea>
+                  <span class="error"></span> 
+                  <!-- 验证码 -->
+                  <div id="forwardseccode{$v.tracelog_id}" class="seccode" style="display: none;">
+                    <label for="captcha">{$Think.lang.ds_checkcode}{$Think.lang.ds_colon}</label>
+                    <input name="captcha" class="text" type="text" size="4" maxlength="4"/>
+                    <img src="" title="{$Think.lang.wrong_checkcode_change}" name="codeimage" onclick="this.src='{:captcha_src()}'"/> <span>{$Think.lang.wrong_seccode}</span>
+                  </div>
+                  <input type="text" style="display:none;" />
+                  <!-- 防止点击Enter键提交 -->
+                  <div class="act"> <span class="skin-blue"><span class="btn"><a href="javascript:void(0);" ds_type="forwardbtn" data-param='{"txtid":"{$v.tracelog_id}"}'>{$Think.lang.sns_forward}</a></span></span> <span id="forwardcharcount{$v.tracelog_id}" style="float:right;"></span> <a class="face" ds_type="smiliesbtn" data-param='{"txtid":"forward{$v.tracelog_id}"}' href="javascript:void(0);" >{$Think.lang.sns_smiles}</a> </div>
+                </div>
+              </form>
+            </div>
+            <ul class="forward-list">
+            </ul>
+          </div>
+        </div>
+        <!-- 转发模块end -->
+        <div class="clear"></div>
+      </dl>
+    </li>
+    {/foreach}
+  </ul>
+  {if $hasmore}
+  <div id="lazymore"></div>
+  {else/}
+  <div id="pagehtml">
+    <div class="pagination">{$show_page}</div>
+  </div>
+  {/if}
+  {else/}
+  {if $relation==3}
+  <div class="sns-norecord ml200"><i class="trace-ico pngFix"></i><span>{$Think.lang.sns_trace_nohave_self_1}<a href="{:url('Membersnsfriend/index')}">{$Think.lang.sns_trace_nohave_self_2}</a>{$Think.lang.sns_trace_nohave_self_3}</span></div>
+  {else/}
+  <div class="sns-norecord ml200"><i class="trace-ico pngFix"></i><span>{$Think.lang.sns_trace_nohave}</span></div>
+  {/if}
+  {/if}
+</div>

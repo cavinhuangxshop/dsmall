@@ -1,0 +1,41 @@
+<div class="dsc-bottom"> <a href="javascript:void(0)" id='submitOrder' class="dsc-btn dsc-btn-acidblue fr">提交订单</a> </div>
+<script>
+    function submitNext() {
+        if (!SUBMIT_FORM)
+            return;
+        if ($('input[name="cart_id[]"]').size() == 0) {
+            alert('所购商品无效');
+            return;
+        }
+        if ($('#address_id').val() == '') {
+            alert('请先设置收货地址');
+                    return;
+        }
+        if ($('#buy_city_id').val() == '') {
+            alert('有商品不支持该地区的配送,请返回重新选择商品');
+            return;
+        }
+        if (($('input[name="pd_pay"]').prop('checked') || $('input[name="rcb_pay"]').prop('checked')) && $('#password_callback').val() != '1') {
+            alert('使用充值卡/预存款支付，需输入支付密码并使用');
+            return;
+        }
+        if ($('input[name="fcode"]').size() == 1 && $('#fcode_callback').val() != '1') {
+		showDialog('请输入并使用F码', 'error','','','','','','','','',2);
+		return;
+	}
+        SUBMIT_FORM = false;
+        $('#order_form').submit();
+    }
+    $(function() {
+        $(document).keydown(function(e) {
+            if (e.keyCode == 13) {
+                submitNext();
+                return false;
+            }
+        });
+        $('#submitOrder').on('click', function() {
+            submitNext()
+        });
+        calcOrder();
+    });
+</script>

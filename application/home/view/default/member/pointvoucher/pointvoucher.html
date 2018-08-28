@@ -1,0 +1,177 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+
+
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/point.css">
+{include file="default/member/pointprod/pointshop_minfo" /}
+<div class="exchange-cate">
+            <div class="w w1200">
+                <input type="hidden" id="storeclass_id" value="{$Request.param.storeclass_id}"/>
+                <a class="{if $Request.param.storeclass_id<=0}curr{/if}" href="javascript:void(0);" ds_type="search_cate" data-param='{"storeclass_id":""}'>全部</a><i class="point">·</i>
+                {foreach name="store_class" item="v"}
+                <a class="{if $Request.param.storeclass_id == $v.storeclass_id}curr{/if}" href="javascript:void(0);" ds_type="search_cate" data-param='{"storeclass_id":"{$v.storeclass_id}"}'>{$v.storeclass_name}</a><i class="point">·</i>
+                {/foreach}
+            </div>
+    </div>
+<div class="dsp-container">
+
+  <div class="dsp-main-layout">
+    <div class="dsp-category">
+      
+
+      <!-- 高级搜索start -->
+      <dl class="searchbox">
+  
+        <dd>
+          <ul>
+              <li>排序：</li>
+            <input type="hidden" id="orderby" name="orderby" value="{$Request.param.orderby ? $Request.param.orderby:'default'}"/>
+            <!-- 默认排序s -->
+            {if $Request.param.orderby=='default' ||!$Request.param.orderby}
+            <li class="selected">默认排序</li>
+            {else /}
+            <li ds_type="search_orderby" data-param='{"orderval":"default"}'>默认排序</li>
+           {/if}
+            <!-- 默认排序e -->
+
+            <!-- 兑换量s -->
+            {if $Request.param.orderby=='exchangenumdesc'}
+            <li class="selected" ds_type="search_orderby" data-param='{"orderval":"exchangenumasc"}'>兑换量<em class="fa desc"></em></li>
+            {elseif $Request.param.orderby=='exchangenumasc'}
+            <li class="selected" ds_type="search_orderby" data-param='{"orderval":"exchangenumdesc"}'>兑换量<em class="fa asc"></em></li>
+            {else /}
+            <li ds_type="search_orderby" data-param='{"orderval":"exchangenumdesc"}'>兑换量<em class="fa"></em></li>
+            {/if}
+            <!-- 兑换量e -->
+
+            <!-- 积分值s -->
+             {if $Request.param.orderby=='pointsdesc'}
+            <li class="selected" ds_type="search_orderby" data-param='{"orderval":"pointsasc"}'>积分值<em class="fa desc"></em></li>
+            {elseif $Request.param.orderby=='pointsasc'}
+            <li class="selected" ds_type="search_orderby" data-param='{"orderval":"pointsdesc"}'>积分值<em class="fa asc"></em></li>
+            {else /}
+            <li ds_type="search_orderby" data-param='{"orderval":"pointsdesc"}'>积分值<em class="fa"></em></li>
+            {/if}
+            <!-- 积分值e -->
+            <li>&nbsp;</li>
+            <!-- 面额s -->
+            <li>优惠券面额：
+              <select id="price" onchange="javascript:searchvoucher();">
+                <option value='' selected >-请选择-</option>
+                {notempty name="pricelist"}
+                {foreach name="pricelist" item="v"}
+                <option value="{$v.voucherprice}" {$Request.param.price == $v.voucherprice ?'selected':''}>{$v.voucherprice}{$Think.lang.currency_zh}代金券</option>
+                {/foreach}
+                {/notempty}
+              </select>
+            </li>
+            <!-- 面额e -->
+            <li>&nbsp;</li>
+            <!-- 所需积分s -->
+            <li>所需积分：
+              <input type="text" id="points_min" class="text w50" value="{$Request.param.points_min}"/>
+              ~
+              <input type="text" id="points_max" class="text w50" value="{$Request.param.points_max}" />
+              <a href="javascript:searchvoucher();" class="dsp-btn">搜索</a> </li>
+            <!-- 所需积分e -->
+            {if $Think.session.is_login=='1'}
+            <li>
+              <label for="isable"><input type="checkbox" id="isable" {$Request.param.isable ==1?'checked="checked"':''} onclick="javascript:searchvoucher();">
+              &nbsp;只看我能兑换 </label></li>
+            {/if}
+          </ul>
+        </dd>
+      </dl>
+      <!-- 高级搜索end --></div>
+    {notempty name="voucherlist"}
+    <ul class="dsp-voucher-list">
+      {foreach name="voucherlist" item="v"}
+      <li>
+        <div class="coupon_item">
+            <div class="coupon_lk">
+                <div class="lazyimg lazyimg_loaded coupon_img">
+                    <img class="lazyload" data-original="{$v.vouchertemplate_customimg}" onerror="this.src='{$Think.UPLOAD_SITE_URL}{:default_goodsimage(240)}'">
+                </div>
+                <a href="javascript:void(0);" ds_type="exchangebtn" data-param='{"vid":"{$v.vouchertemplate_id}"}'>
+                    <div class="coupon_more">
+                        <div class="coupon_more_inner">立即兑换</div>
+                            
+                    </div>
+                </a>
+                <div class="coupon_info">
+                    <div class="mod_price coupon_price"><i>¥</i><span>{$v.vouchertemplate_price}</span></div>
+                    <div class="coupon_limit" title="{$v.vouchertemplate_storename}满{$v.vouchertemplate_limit}元可用"><a href="{:url('Store/index',['store_id'=>$v.vouchertemplate_store_id])}">{$v.vouchertemplate_storename}</a>满{$v.vouchertemplate_limit}元可用</div>
+                    <div class="coupon_desc" title="需{$v.vouchertemplate_points}积分">需<em>{$v.vouchertemplate_points}</em>积分</div>
+                        
+                </div>
+            </div>
+        </div>
+      </li>
+      {/foreach}
+    </ul>
+    <div class="tc mt20 mb20">
+      <div class="pagination">{$show_page}</div>
+    </div>
+   {else /}
+    <div class="norecord">{$Think.lang.home_voucher_list_null}</div>
+    {/notempty}
+  </div>
+</div>
+<script>
+$(function(){
+	//代金券兑换功能
+    $("[ds_type='exchangebtn']").on('click',function(){
+    	var data_str = $(this).attr('data-param');
+	    eval( "data_str = "+data_str);
+	    ajaxget("{:url('Pointvoucher/voucherexchange')}?dialog=1&vid="+data_str.vid);
+	    return false;
+    });
+});
+</script>
+
+<script>
+$(function () {
+    $("[ds_type='search_orderby']").click(function(){
+        var data_str = $(this).attr('data-param');
+        eval( "data_str = "+data_str);
+        $("#orderby").val(data_str.orderval);
+        searchvoucher();
+    });
+    $("[ds_type='search_cate']").click(function(){
+        var data_str = $(this).attr('data-param');
+        eval( "data_str = "+data_str);
+        $("#storeclass_id").val(data_str.storeclass_id);
+        searchvoucher();
+    });
+});
+function searchvoucher(){
+    var url = "{:url('Pointvoucher/index')}"+'?';
+    var storeclass_id = $("#storeclass_id").val();
+    if(storeclass_id){
+        url += ('storeclass_id='+storeclass_id)+'&';
+    }
+    var orderby = $("#orderby").val();
+    if(orderby){
+        url += ('orderby='+orderby)+'&';
+    }
+    var price = $("#price").val();
+    if(price){
+        url += ('price='+price)+'&';
+    }
+    var points_min = $("#points_min").val();
+    if(points_min){
+        url += ('points_min='+points_min)+'&';
+    }
+    var points_max = $("#points_max").val();
+    if(points_max){
+        url += ('points_max='+points_max)+'&';
+    }
+    if($("#isable").attr("checked") == 'checked'){
+        url += 'isable=1';
+    }
+    go(url);
+}
+</script>
+
+
+{/block}

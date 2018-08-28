@@ -1,0 +1,120 @@
+{include file="default/base/mall_top" /} 
+
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home_cart.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/mlselection.js"></script>
+<div class="dsc-header">
+    <div class="logo">
+        <a href="{$Think.HOME_SITE_URL}"><img src="{$Think.config.url_attach_common}/{$Think.config.site_logo}"/></a>
+    </div>
+    <ul class="dsc-flow">
+        <li class=""><i class="fa fa-shopping-cart"></i>
+            <p>我的购物车</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+        <li class=""><i class="fa fa-pencil"></i>
+            <p>填写核对购物信息</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+        <li class="current"><i class="fa fa-credit-card-alt"></i>
+            <p>支付提交</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+        <li class=""><i class="fa fa-thumbs-o-up"></i>
+            <p>订单完成</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+    </ul>
+</div>
+<div class="dsc-main">
+  <div class="dsc-title">
+    <h3>支付提交</h3>
+    <h5>订单详情内容可通过查看<a href="{:url('Memberorder/index')}" target="_blank">我的订单</a>进行核对处理。</h5>
+  </div>
+  <form action="{:url('Payment/real_order')}" method="POST" id="buy_form">
+    <input type="hidden" name="pay_sn" value="{$pay_info.pay_sn}">
+    <input type="hidden" id="payment_code" name="payment_code" value="">
+    <div class="dsc-receipt-info">
+      <div class="dsc-receipt-info-title">
+        <h3>
+            {$order_remind}
+            {if condition="$pay_amount_online gt 0"}
+            在线支付金额：<strong>￥{$pay_amount_online}</strong>
+            {/if}
+          </h3>
+      </div>
+      <table class="dsc-table-style">
+        <thead>
+          <tr>
+            <th class="w50"></th>
+            <th class="w200 tl">订单号</th>
+            <th class="tl w150">支付方式</th>
+            <th class="tl">金额</th>
+            <th class="w150">物流</th>
+          </tr>
+        </thead>
+        <tbody>
+          {if count($order_list)>1}
+          <tr>
+            <th colspan="20">由于您的商品由不同商家发出，此单将分为{:count($order_list)}个不同子订单配送！</th>
+          </tr>
+          {/if}
+          {foreach name="order_list" item="order" key="key" }
+          <tr>
+            <td></td>
+            <td class="tl">{$order.order_sn}</td>
+            <td class="tl">{$order.payment_state}</td>
+            <td class="tl">￥{$order.order_amount}</td>
+            <td>快递</td>
+          </tr>
+          {/foreach}
+        </tbody>
+      </table>
+    </div>
+    <div class="dsc-receipt-info">
+      {notempty name="payment_list"}
+      <div class="dsc-receipt-info-title">
+        <h3>选择在线支付</h3>
+      </div>
+      <ul class="dsc-payment-list">
+        {foreach name="payment_list" item="val"}
+        <li payment_code="{$val.payment_code}">
+          <label for="pay_{$val.payment_code}">
+          <i></i>
+          <div class="logo" for="pay_{$val.payment_code}"> <img src="{$Think.HOME_SITE_ROOT}/images/payment/{$val.payment_code}_logo.gif" /> </div>
+          </label>
+        </li>
+        {/foreach}
+      </ul>
+      {else /}
+      <div class="nopay">抱歉，暂时没有符合条件的支付方式，请 联系卖家 进行后续购买流程</div>
+      {/notempty}
+    </div>
+    {if $pay_amount_online > 0}
+    <div class="dsc-bottom tc mb50"><a href="javascript:void(0);" id="next_button" class="dsc-btn dsc-btn-green"><i class="fa fa-shield"></i>确认提交支付</a></div>
+    {/if}
+  </form>
+</div>
+<script type="text/javascript">
+$(function(){
+    $('.dsc-payment-list > li').on('click',function(){
+    	$('.dsc-payment-list > li').removeClass('using');
+        $(this).addClass('using');
+        $('#payment_code').val($(this).attr('payment_code'));
+    });
+    $('#next_button').on('click',function(){
+        if ($('#payment_code').val() == '') {
+        	showDialog('请选择支付方式', 'error','','','','','','','','',2);return false;
+        }
+        $('#buy_form').submit();
+    });
+});
+</script>
+
+
+
+
+{include file="default/base/mall_footer" /}

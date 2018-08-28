@@ -1,0 +1,139 @@
+{block name="mall_top"}{include file='default/base/mall_top'/}{/block}
+
+
+
+<link href="{$Think.HOME_SITE_ROOT}/css/sns.css" rel="stylesheet" type="text/css">
+<link id="skin_link" href="{$Think.HOME_SITE_ROOT}/images/sns/style/skin_01.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+var MAX_RECORDNUM = {$max_recordnum};
+</script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.charCount.js"></script>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/member.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns_friend.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns_store.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/smilies/smilies.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/smilies/smilies_data.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.caretInsert.js" charset="utf-8"></script>
+<header id="header" class="pngFix">
+  <div class="wrapper">
+    <h1 id="logo" title="{$Think.config.site_name}"><a href="{$Think.HOME_SITE_URL}"><img src="{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_COMMON}/{$Think.config.member_logo}" alt="{$Think.config.site_name}" class="pngFix"></a></h1>
+    <h2>{$Think.lang.ds_mysns}</h2>
+    <div class="search">
+      <form id="formSearch" name="formSearch" action="" method="get">
+        <input id="keyword" class="dss-search-input-text" type="text" lang="zh-CN" x-webkit-grammar="builtin:search" onwebkitspeechchange="foo()" x-webkit-speech="" name="keyword" style="color: rgb(153, 153, 153);">
+        <a class="dss-search-btn-mall" dstype="search_in_shop" href="javascript:void(0)" onClick="$('#formSearch').submit();"> <span>{$Think.lang.ds_common_search}</span> </a>
+      </form>
+    </div>
+    {if $relation!=0}
+    <ul class="menu">
+      <li class="noborder"><a href="{:url('Member/index')}">{$Think.lang.sns_return_my_shop}</a></li>
+      <li><a href="javascript:void(0)" class="my-friend">{$Think.lang.sns_my_attention}<i></i></a>
+        <div class="friend-menu">
+          <dl>
+            {notempty name="my_attention"}
+            {foreach name="my_attention" item="val"}
+            <dd><a href="{:url('Membersnshome/index',['mid'=>$val.friend_tomid])}"><img src="{if $val.friend_tomavatar !=''}{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_AVATAR}/{$val.friend_tomavatar}{else/}{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_COMMON}/{$Think.config.default_user_portrait}{/if}" />{$val.friend_tomname}</a></dd>
+            {/foreach}
+            {else/}
+            <dd><a href="javascript:void(0);">{$Think.lang.sns_no_attention_tips}</a></dd>
+            {/notempty}
+          </dl>
+          <p>
+            {notempty name="my_attention"}
+            <a href="{:url('Membersnsfriend/follow')}">{$Think.lang.sns_attention_more}</a>
+            {else/}
+            <a href="{:url('Membersnsfriend/index')}">{$Think.lang.sns_search_friend}</a>
+            {/notempty}
+          </p>
+        </div>
+      </li>
+      <li><a href="{:url('Membersnshome/index')}">{$Think.lang.sns_my_personal_homepage}</a></li>
+    </ul>
+    {/if}
+  </div>
+</header>
+<div id="container" class="wrapper mt20">
+  <div class="user-info">
+    <div class="user-face">
+      <div class="hover-layout"><span class="thumb size120"><i></i><img src="{if $master_info.member_avatar !=''}{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_AVATAR}/{$master_info.member_avatar}{else/}{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_COMMON}/{$Think.config.default_user_portrait}{/if}" />
+        {if $relation==3}
+        <a href="{:url('Memberinformation/avatar')}" title="{$Think.lang.ds_updateavatar}">{$Think.lang.sns_change_avatar}</a>
+        {/if}
+        </span></div>
+    </div>
+    <dl class="user-data">
+      <dt>
+        <h2>{if $master_info.member_truename!=''}{$master_info.member_truename}{else/}{$master_info.member_name}{/if}</h2>
+        <span class="add-friend ml10"><span style="{if $relation!=2}display:none;{/if}" ds_type="mutualsign">{$Think.lang.sns_mutual_attention}</span><span style="{if $relation!=4}display:none;{/if}" ds_type="followsign">{$Think.lang.sns_already_attention}</span>
+        {if $relation==1}
+        <a data-param='{"mid":"{$master_info.member_id}"}' ds_type="followbtn" href="javascript:void(0)">{$Think.lang.sns_add_attention}</a>
+        {/if}
+        </span> </dt>
+      <dd>
+        {if $master_info.member_sex == 1}
+        <span class="male pngFix">{$Think.lang.sns_man}</span>
+        {elseif $master_info.member_sex==2 /}
+        <span class="female pngFix">{$Think.lang.sns_woman}</span>
+        {/if}
+        <span class="location">{$master_info.member_areainfo}</span>
+        {if $master_info.tagname!=''}
+        <span class="tag">{$Think.lang.sns_interest_label}{$Think.lang.ds_colon}
+        {foreach $master_info.tagname as $val} 
+        <em>{$val}</em>
+        {/foreach}
+        </span>
+        {/if}
+        {if $relation==3}
+        <span><a href="{:url('Memberinformation/index')}" title="{$Think.lang.sns_edit_data}">{$Think.lang.sns_edit_data}</a></span>
+        {/if}
+      </dd>
+    </dl>
+    <div class="user-stat">
+      <dl class="noborder">
+        <dd>{$master_info.fan_count}</dd>
+        <dt>{$Think.lang.sns_fans}</dt>
+      </dl>
+      <dl>
+        <dd>{$master_info.attention_count}</dd>
+        <dt>{$Think.lang.sns_attention}</dt>
+      </dl>
+      <dl>
+        <dd>{$master_info.member_snsvisitnum}</dd>
+        <dt>{$Think.lang.sns_visit}</dt>
+      </dl>
+    </div>
+  </div>
+  <div class="sns-nav">
+    <ul>
+      <li><a {if $menu_sign=='snshome'}class="current"{/if}  href="{:url('Membersnshome/index',['mid'=>$master_id])}"><i class="fa fa-home"></i>{$Think.lang.ds_index}</a></li>
+      <li><a {if $menu_sign=='sharegoods'}class="current"{/if} href="{:url('Membersnshome/shareglist',['mid'=>$master_id])}"><i class="fa fa-picture-o"></i>{$Think.lang.sns_treasure}</a></li>
+      <li><a {if $menu_sign=='sharestore'}class="current"{/if} href="{:url('Membersnshome/storelist',['mid'=>$master_id])}"><i class="fa fa-shopping-basket"></i>{$Think.lang.sns_store}</a></li>
+      <li><a {if $menu_sign=='snsalbum'}class="current"{/if} href="{:url('Snsalbum/index',['mid'=>$master_id])}"><i class="fa fa-camera"></i>{$Think.lang.sns_album}</a></li>
+      <li><a {if $menu_sign=='snstrace'}class="current"{/if} href="{:url('Membersnshome/trace',['mid'=>$master_id])}"><i class="fa fa-share-alt"></i>{$Think.lang.sns_fresh_news}</a></li>
+    </ul>
+  </div>
+  <div class="sns-main">
+      {block name="sns_main"}{/block}
+  </div>
+  <!-- 表情弹出层 -->
+  <div id="smilies_div" class="smilies-module"></div>
+</div>
+
+
+
+
+
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.ajaxContent.pack.js" ></script> 
+<script type="text/javascript" language="javascript">
+var max_recordnum = '{$max_recordnum}';
+
+$(function(){
+        // 显示关注好友名单
+  $(".my-friend").click(function(){
+    $(".friend-menu").slideToggle("1000");
+  });
+});
+</script>
+
+{block name="mall_footer"}{include file='default/base/mall_footer'/}{/block}

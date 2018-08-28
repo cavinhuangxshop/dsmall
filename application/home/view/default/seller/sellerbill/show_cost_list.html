@@ -1,0 +1,76 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+
+<style>
+.bill-alert-block{padding-bottom:14px;padding-top:14px}
+.bill_alert{background-color:#F9FAFC;border:1px solid #F1F1F1;margin-bottom:20px;padding:8px 35px 8px 14px;text-shadow:0 1px 0 rgba(255,255,255,.5);line-height:30px}
+</style>
+<div class="bill_alert bill-alert-block mt10">
+    <div style="width:800px"><h3 style="float:left">本期结算</h3><div style="float:right;">
+            {if $bill_info['ob_state'] == BILL_STATE_CREATE}
+            <a class="dssc-btn mt5" onclick="ajax_get_confirm('一旦确认将无法恢复，系统将自动进入结算环节,<BR/>确认系统出账单计算无误吗?', '{:url('Sellerbill/confirm_bill',['ob_no'=>$bill_info.ob_no])}');" href="javascript:void(0)">本期结算无误，我要确认</a>
+            {elseif $bill_info['ob_state'] == BILL_STATE_SUCCESS /}
+            <a class="dssc-btn mt5" target="_blank" href="{:url('Sellerbill/bill_print',['ob_no'=>$bill_info.ob_no])}">打印结算单</a>
+            {/if}
+        </div>
+        <div style="clear:both"></div>
+    </div>
+    <ul>
+        <li>结算单号：{$bill_info.ob_no}&emsp;{$bill_info.ob_startdate|date="Y-m-d",###} &nbsp;至&nbsp; {$bill_info.ob_enddate|date="Y-m-d",###}</li>
+        <li>出账时间：{$bill_info.ob_createdate|date="Y-m-d",###}</li>
+        <li>本期应收：{$bill_info.ob_result_totals} = {$bill_info.ob_order_totals} (订单金额) - {$bill_info.ob_commis_totals} (佣金金额) - {$bill_info.ob_order_return_totals} (退单金额) + {$bill_info.ob_commis_return_totals} (退还佣金) - {$bill_info.ob_store_cost_totals} (促销费用)</li>
+        <li>结算状态：{:get_bill_state($bill_info['ob_state'])}{if $bill_info['ob_state'] == BILL_STATE_SUCCESS}，结算日期：{$bill_info.ob_paydate|date="Y-m-d",###}{/if}
+        </li>
+    </ul>
+</div>
+<!--区分部分 BEGIN-->
+
+
+
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w10"></th>
+            <th>促销名称</th>
+            <th>促销费用</th>
+            <th>申请日期</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="cost_list"}
+        {foreach name="cost_list" item="cost_info"}
+        <tr class="bd-line">
+            <td></td>
+            <td>{$cost_info.storecost_remark}</td>
+            <td>{:ds_price_format($cost_info['storecost_price'])}</td>
+            <td>{$cost_info.storecost_time|date="Y-m-d",###}</td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr>
+            <td colspan="20" class="norecord"><i>&nbsp;</i><span>{$Think.lang.no_record}</span></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="cost_list"}
+        <tr>
+            <td colspan="20"><div class="pagination">{$show_page}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+
+
+
+<!--区分部分 END-->
+<script type="text/javascript">
+                $(document).ready(function() {
+                    $('#query_start_date').datepicker({dateFormat: 'yy-mm-dd'});
+                    $('#query_end_date').datepicker({dateFormat: 'yy-mm-dd'});
+                });
+</script>
+
+{/block}

@@ -1,0 +1,415 @@
+{extend name="default/base/base_joinin" /}
+{block name="joinin_main"}
+
+<script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$baidu_ak}"></script>
+<script>
+    var local;
+    var map;
+    var lst_name='';
+    function change_map(){
+            if($("#area_ select:eq(0)").length>0 && $("#area_ select:eq(0) option:selected").val()!=''){
+                var name=$("#area_ select:eq(0) option:selected").text();
+            }
+            if($("#area_ select:eq(1)").length>0 && $("#area_ select:eq(1) option:selected").val()!=''){
+                var name=$("#area_ select:eq(1) option:selected").text();
+            }
+            if($("#area_ select:eq(2)").length>0 && $("#area_ select:eq(2) option:selected").val()!=''){
+                var name=$("#area_ select:eq(2) option:selected").text();
+            }
+            if(name!='' && lst_name!=name){
+                lst_name=name;
+                map.setCurrentCity(name);
+                map.centerAndZoom(name,16);
+                map.clearOverlays();
+                local.search(name);
+            }
+            
+    }
+    $(function(){
+        map = new BMap.Map("allmap");
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(function (r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                var lng = r.point.lng;
+                var lat = r.point.lat;
+                var point = new BMap.Point(lng, lat);
+                map.centerAndZoom(point, 16);
+                map.addControl(new BMap.NavigationControl());
+                map.enableScrollWheelZoom();    
+                var marker = new BMap.Marker(point);  // 创建标注
+                map.addOverlay(marker);              // 将标注添加到地图中
+                marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                document.getElementById("longitude").value = lng;
+                document.getElementById("latitude").value = lat;
+
+            } else {
+                alert('failed' + this.getStatus());
+            }
+        }, {enableHighAccuracy: true})
+             
+                var options = {
+                        onSearchComplete: function(results){
+                                // 判断状态是否正确
+                                if (local.getStatus() == BMAP_STATUS_SUCCESS){
+                                    if(results.getCurrentNumPois()>0){
+                        
+                                        map.clearOverlays();  //清除标注  或者可以把market 放入数组
+                                        var point = new BMap.Point(results.getPoi(0).point.lng , results.getPoi(0).point.lat);
+                                        var marker = new BMap.Marker(point);
+                                        map.centerAndZoom(point, 16);
+                                        map.addOverlay(marker);
+                                        marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                                        
+                                        document.getElementById("longitude").value = results.getPoi(0).point.lng;
+                                        document.getElementById("latitude").value = results.getPoi(0).point.lat;
+                                        
+                                    }
+                                }
+                        }
+                };
+                local = new BMap.LocalSearch(map, options);
+                map.addEventListener("click", function(e){
+//                    alert(e.point.lng + ", " + e.point.lat);
+                    map.clearOverlays();  //清除标注  或者可以把market 放入数组
+                    var point = new BMap.Point(e.point.lng , e.point.lat);
+                    var marker = new BMap.Marker(point);
+                    map.addOverlay(marker);
+                    marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                    
+                    document.getElementById("longitude").value = e.point.lng;
+                    document.getElementById("latitude").value = e.point.lat;
+                });
+    })
+</script>
+<div class="breadcrumb"><span class="fa fa-home"></span><span><a href="">首页</a></span> <span class="arrow">></span> <span>商家入驻申请</span> </div>
+<div class="main">
+    <div class="sidebar">
+        <div class="title">
+            <h3>商家入驻申请</h3>
+        </div>
+        <div class="content">
+            {notempty name="help_list"}
+            {foreach name="help_list" item="val" key="key" }
+            <dl show_id="{$val.helptype_id}">
+                <dt onclick="show_list('{$val.helptype_id}');" style="cursor: pointer;"> <i class="hide"></i>{$val.helptype_name}</dt>
+                <dd style="display:none;">
+                    <ul>
+                        {notempty name="$val.help_list"}
+                        {foreach name="$val.help_list" item="v" key="k" }
+                        <li> <i></i>
+                            {notempty name="$v.help_url"}
+                            <a href="{:url('Showhelp/index',['t_id'=>$v.helptype_id,'help_id'=>$v.help_id])}" target="_blank">{$v.help_title}</a>
+                            {else /}
+                            <a href="{$v.help_url}" target="_blank">{$v.help_title}</a>
+                            {/notempty}
+                        </li>
+                       {/foreach}
+                       {/notempty}
+                    </ul>
+                </dd>
+            </dl>
+            {/foreach}
+            {/notempty}
+            <dl>
+                <dt class="{if $sub_step=='step0'}current{/if}"> <i class="hide"></i>签订入驻协议</dt>
+            </dl>
+            <dl show_id="0">
+                <dt onclick="show_list('0');" style="cursor: pointer;"> <i class="show"></i>提交申请</dt>
+                <dd>
+                    <ul>
+                        <li class="{if $step=='1'}current{/if}"><i></i>公司资质信息</li>
+                        <li class="{if $step=='2'}current{/if}"><i></i>财务资质信息</li>
+                        <li class="{if $step=='3'}current{/if}"><i></i>店铺经营信息</li>
+                    </ul>
+                </dd>
+            </dl>
+            <dl>
+                <dt class="{if $step=='4'}current{/if}"> <i class="hide"></i>合同签订及缴费</dt>
+            </dl>
+            <dl>
+                <dt> <i class="hide"></i>店铺开通</dt>
+            </dl>
+        </div>
+        <div class="title">
+            <h3>平台联系方式</h3>
+        </div>
+        <div class="content">
+            <ul>
+                {notempty name="phone_array"}
+                {foreach name="phone_array" item="val" key="key" }
+                电话{$val}
+                {/foreach}
+                {/notempty}
+                <li>邮箱:{$Think.config.site_email}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="right-layout">
+        <div class="joinin-step">
+            <ul>
+                <li class="step1 {if $step >= 0}current{/if}"><span>签订入驻协议</span></li>
+                <li class="{if $step >= 1}current{/if}"><span>公司资质信息</span></li>
+                <li class="{if $step >= 2}current{/if}"><span>财务资质信息</span></li>
+                <li class="{if $step >= 3}current{/if}"><span>店铺经营信息</span></li>
+                <li class="{if $step >= 4}current{/if}"><span>合同签订及缴费</span></li>
+                <li class="step6"><span>店铺开通</span></li>
+            </ul>
+        </div>
+        <div class="joinin-concrete">
+            <!--区别部分 BEGIN-->
+
+
+
+            
+            
+
+<!-- 公司信息 简化 -->
+
+<div id="apply_company_info" class="apply-company-info">
+  <div class="alert">
+    <h4>注意事项：</h4>
+    以下所需要上传的电子版资质文件仅支持JPG\GIF\PNG格式图片，大小请控制在1M之内。</div>
+  <form id="form_company_info" action="{:url('Sellerjoinin/step2')}" method="post" enctype="multipart/form-data" >
+    <table border="0" cellpadding="0" cellspacing="0" class="all">
+      <thead>
+        <tr>
+          <th colspan="2">公司及联系人信息</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><i>*</i>公司名称：</th>
+          <td><input name="company_name" type="text" class="w200"/>
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>公司所在地：</th>
+          <td id="area_" onclick="change_map()">
+              <input id="company_address" name="company_address" type="hidden" value=""/>
+              <input type="hidden" value="" name="province_id" id="_area_1">
+           <input type="hidden" value="" name="city_id" id="_area_2">
+           <input type="hidden" value="" name="district_id" id="_area_3">
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>公司详细地址：</th>
+          <td><input name="company_address_detail" type="text" class="w200" onkeyup="local.search($(this).val());">
+            <div>
+                <input name="longitude" id="longitude" type="hidden" />
+                <input name="latitude" id="latitude" type="hidden" />
+                <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
+            </div><span></span></td>
+        </tr>
+
+        <tr>
+          <th><i>*</i>注册资金：</th>
+          <td><input name="company_registered_capital" type="text" class="w50">
+            &nbsp;万元<span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>联系人姓名：</th>
+          <td><input name="contacts_name" type="text" class="w100" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>联系人手机：</th>
+          <td><input name="contacts_phone" type="text" class="w100" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>电子邮箱：</th>
+          <td><input name="contacts_email" type="text" class="w200" />
+            <span></span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="20">&nbsp;</td>
+        </tr>
+      </tfoot>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" class="all">
+      <thead>
+        <tr>
+          <th colspan="20">营业执照信息（副本）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><i>*</i>营业执照号：</th>
+          <td><input name="business_licence_number" type="text" class="w200" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>营业执照所在地：</th>
+          <td><input id="business_licence_address" name="business_licence_address" type="hidden" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>营业执照有效期：</th>
+          <td><input id="business_licence_start" name="business_licence_start" type="text" class="w90" />
+            <span></span>-
+            <input id="business_licence_end" name="business_licence_end" type="text" class="w90" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th>经营范围：</th>
+          <td><textarea name="business_sphere" rows="3" class="w200"></textarea>
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>营业执照电子版：</th>
+          <td><input name="business_licence_number_electronic" type="file" class="w200" />
+            <span class="block">图片大小请控制在1M之内，请确保图片清晰，文字可辨并有清晰的红色公章。</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="20">&nbsp;</td>
+        </tr>
+      </tfoot>
+    </table>
+    
+
+  </form>
+  <div class="bottom"><a id="btn_apply_company_next" href="javascript:;" class="btn">下一步，提交财务资质信息</a></div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('#company_address').ds_region();
+    $('#business_licence_address').ds_region();
+    
+    $('#business_licence_start').datepicker({dateFormat: "yy-mm-dd"});
+    $('#business_licence_end').datepicker({dateFormat: "yy-mm-dd"});
+
+    $('#btn_apply_agreement_next').on('click', function() {
+        if($('#input_apply_agreement').prop('checked')) {
+            $('#apply_agreement').hide();
+            $('#apply_company_info').show();
+        } else {
+            alert('请阅读并同意协议');
+        }
+    });
+
+    $('#form_company_info').validate({
+        errorPlacement: function(error, element){
+            element.nextAll('span').first().after(error);
+        },
+        rules : {
+            company_name: {
+                required: true,
+                maxlength: 50 
+            },
+            company_address: {
+                required: true,
+                maxlength: 50 
+            },
+            company_address_detail: {
+                required: true,
+                maxlength: 50 
+            },
+
+            company_registered_capital: {
+                required: true,
+                digits: true 
+            },
+            contacts_name: {
+                required: true,
+                maxlength: 20 
+            },
+            contacts_phone: {
+                required: true,
+                maxlength: 20 
+            },
+            contacts_email: {
+                required: true,
+                email: true 
+            },
+            business_licence_number: {
+                required: true,
+                maxlength: 20
+            },
+            business_licence_address: {
+                required: true,
+                maxlength: 50
+            },
+            business_licence_start: {
+                required: true
+            },
+            business_licence_end: {
+                required: true
+            },
+           
+        },
+        messages : {
+            company_name: {
+                required: '请输入公司名称',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+            company_address: {
+                required: '请选择区域地址',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+            company_address_detail: {
+                required: '请输入公司详细地址',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+
+         
+            company_registered_capital: {
+                required: '请输入注册资金',
+                digits: '必须为数字'
+            },
+            contacts_name: {
+                required: '请输入联系人姓名',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+            contacts_phone: {
+                required: '请输入联系人电话',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+            contacts_email: {
+                required: '请输入常用邮箱地址',
+                email: '请填写正确的邮箱地址'
+            },
+            business_licence_number: {
+                required: '请输入营业执照号',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+            business_licence_address: {
+                required: '请选择营业执照所在地',
+                maxlength: jQuery.validator.format("最多{0}个字")
+            },
+            business_licence_start: {
+                required: '请选择生效日期'
+            },
+            business_licence_end: {
+                required: '请选择结束日期'
+            },
+
+        }
+    });
+
+    $('#btn_apply_company_next').on('click', function() {
+        if($('#form_company_info').valid()) {
+        	$('#company_address').next().attr('name','province_id');
+            $('#form_company_info').submit();
+        }
+    });
+});
+</script> 
+
+
+
+
+
+
+            <!--区别部分 END-->
+        </div>
+    </div>
+</div>
+
+
+
+{/block}

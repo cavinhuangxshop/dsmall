@@ -1,0 +1,95 @@
+{extend name="default/base/base_sns" /}
+{block name="sns_main"}
+
+
+
+<div class="sidebar">
+    {include file='default/sns/membersnshome/sns_sidebar_sharegoods'/}
+</div>
+<div class="left-content">
+  <input type="hidden" id="rtype" value="{$Request.param.type}"/>
+  <div class="goback">
+      <a href="{$Think.HOME_SITE_URL}/Membersnshome/shareglist.html?type={if $Request.get.type=='like'}like{else/}share{/if}&mid={$sharegoods_info.sharegoods_memberid}">&#8249;&nbsp;{$Think.lang.sns_goback_all_goods}</a>
+  </div>
+  <div class="snsgoods-info">
+    <div class="title">
+      <h3>{$sharegoods_info.snsgoods_goodsname}</h3>
+    </div>
+    <div class="gcontainer">
+      <div class="pic-module">
+        <div class="good-img"> <img src="{:goods_cthumb($sharegoods_info['snsgoods_goodsimage'],1280,$sharegoods_info['snsgoods_storeid'])}"/> </div>
+      </div>
+      <div class="handle-module">
+        <div class="operate" id="likestat_{$sharegoods_info.sharegoods_goodsid}"><span><i></i>
+          {if isset($sharegoods_info.snsgoods_havelike) && $sharegoods_info.snsgoods_havelike == 1}
+          {$Think.lang.sns_like}
+          {else/}
+          <a href="javascript:void(0);" ds_type="likebtn" data-param='{"gid":"{$sharegoods_info.sharegoods_goodsid}"}' class="{if isset($sharegoods_info.snsgoods_havelike) && $sharegoods_info.snsgoods_havelike ==1}noaction{/if}">{$Think.lang.sns_like}</a>
+          {/if}
+          </span> <em ds_type="likecount_{$sharegoods_info.sharegoods_goodsid}">{$sharegoods_info.snsgoods_likenum}</em></div>
+        {if $relation == 3}
+        <!--主人自己-->
+        <div class="btn set" ds_type="privacydiv" id="recordone_{$sharegoods_info.sharegoods_id}"> <a href="javascript:void(0)" ds_type="privacybtn"><i></i>{$Think.lang.sns_setting}</a>
+          <ul ds_type="privacytab" style="display:none;" >
+            <li ds_type="privacyoption" data-param='{"sid":"{$sharegoods_info.sharegoods_id}","v":"0"}'><span class="{if $sharegoods_info.sharegoods_privacy==0}selected{/if}">{$Think.lang.sns_open}</span></li>
+            <li ds_type="privacyoption" data-param='{"sid":"{$sharegoods_info.sharegoods_id}","v":"1"}'><span class="{if $sharegoods_info.sharegoods_privacy==1}selected{/if}">{$Think.lang.sns_friend}</span></li>
+            <li ds_type="privacyoption" data-param='{"sid":"{$sharegoods_info.sharegoods_id}","v":"2"}'><span class="{if $sharegoods_info.sharegoods_privacy==2}selected{/if}">{$Think.lang.sns_privacy}</span></li>
+          </ul>
+        </div>
+        {if $Request.param.type != 'like'}
+        <div class="btn buyer-show"><a href="javascript:void(0)" dstype="add_share" data-param="{'sid':'{$sharegoods_info.sharegoods_id}', 'gid':'{$sharegoods_info.sharegoods_goodsid}'}"><i></i>{$Think.lang.sns_buyershow}</a></div>
+        {/if}
+        {/if}
+        <div class="btn"><a href="{$sharegoods_info.snsgoods_goodsurl}" target="_blank"><strong>{$Think.lang.sns_viewdetails}</strong></a></div>
+        <div class="price">￥{$sharegoods_info.snsgoods_goodsprice}</div>
+      </div>
+    </div>
+    {if $Request.param.type != 'like'}<div class="share-content"><i></i><p>{$sharegoods_info.sharegoods_content}<i></i></p></div>{/if}
+    <!-- 买家秀图片S -->
+    {notempty name="pic_list"}
+    <div class="ap-pic-module"><div class="top"><span>{$Think.lang.sns_buyershow}</span><h3>{$Think.lang.sns_upload_buyer_show}</h3></div>
+    <div class="picture">
+        {foreach name="pic_list" item="val" }
+        <img src="{:sns_thumb($val['ap_name'])}" />
+        {/foreach}
+    </div>
+    </div>
+    {/notempty}
+    <!-- 买家秀图片E -->
+    <div class="interact-module"><span class="add-time">{if $Request.param.type=='like'}{$sharegoods_info.sharegoods_likeaddtime|date="Y-m-d H:i",###}{else/}{$sharegoods_info.sharegoods_addtime|date="Y-m-d H:i",###}{/if}</span>
+      <ul>
+        <li><a data-param='{"gid":"{$sharegoods_info.sharegoods_goodsid}"}' ds_type="sharegoods" href="javascript:void(0);">{$Think.lang.ds_snsshare}<em>({$sharegoods_info.snsgoods_sharenum})</em></a></li>
+        <li><a href="javascript:void(0);" class="comment-btn">{$Think.lang.sns_comment}<em>({$sharegoods_info.sharegoods_commentcount})</em></a></li>
+      </ul>
+    </div>
+    <!-- 商品评论 -->
+    <div class="comment-module">
+      <div class="arrow"></div>
+      <div id="tracereply_{$sharegoods_info.sharegoods_id}" class="load-module"></div>
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+</div>
+<div class="clear"></div>
+<script type="text/javascript">
+//评论隐藏/显示
+$(document).ready(function(){
+  	$(".comment-btn").click(function(){
+  	$(".comment-module").slideToggle(300);
+  	});
+});
+document.onclick = function(){ $("#smilies_div").html(''); $("#smilies_div").hide();};
+$(function(){
+	//评论加载
+	$("#tracereply_{$sharegoods_info.sharegoods_id}").load('{$Think.HOME_SITE_URL}/Membersnshome/commentlist.html?type=1&mid={$sharegoods_info.sharegoods_memberid}&id={$sharegoods_info.sharegoods_id}');
+	// 追加
+	$('a[dstype="add_share"]').click(function(){
+	    eval( "data_str = "+$(this).attr('data-param'));
+		ajax_form('add_share', '{$Think.lang.sns_upload_treasure_buyer_show}', '{$Think.HOME_SITE_URL}/Membersnshome/add_share.html?type=refresh&sid='+data_str.sid+'&gid='+data_str.gid, 580);
+	});
+});
+</script>
+
+
+
+{/block}

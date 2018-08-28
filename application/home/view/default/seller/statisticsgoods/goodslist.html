@@ -1,0 +1,134 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<div class="alert mt10" style="clear:both;">
+    <ul class="mt5">
+        <li>1、符合以下任何一种条件的订单即为有效订单：1）采用在线支付方式支付并且已付款；2）采用货到付款方式支付并且交易已完成</li>
+        <li>2、以下列表为从昨天开始最近30天有效订单中的所有商品数据</li>
+        <li>3、近30天下单商品数：从昨天开始最近30天有效订单的某商品总销量</li>
+        <li>4、近30天下单金额：从昨天开始最近30天有效订单的某商品总销售额</li>
+        <li>5、点击每列旁边的箭头对列表进行排序，默认按照“近30天成交件数”降序排列</li>
+        <li>6、点击每条记录后的“走势图”，查看最近30天下单金额、下单商品数、下单量走势</li>
+    </ul>
+</div>
+<form method="get"  target="_self" id="formSearch">
+    <table class="search-form">
+        <input type="hidden" id="orderby" name="orderby" value="{$orderby}"/>
+        <tr>
+            <td class="tr">
+                <div class="fr">&nbsp;&nbsp;商品名称
+                    <input type="text" class="text w150" name="search_gname" value="{$Request.param.search_gname}" />
+                    <label class="submit-border">
+                        <input type="submit" class="submit" value="{$Think.lang.ds_common_search}" />
+                    </label>
+                </div>
+                <div class="fr">商品分类&nbsp;
+                    <span id="searchgc_td"></span>
+                    <input type="hidden" id="choose_gcid" name="choose_gcid" value="0"/>
+                </div>
+            </td>
+        </tr>
+    </table>
+</form>
+<table class="dssc-default-table">
+    <thead>
+        <tr class="sortbar-array">
+            <th></th>
+            <th>商品名称</th>
+            <th>价格</th>
+            <th class="align-center">
+                <a title="点击进行排序" ds_type="orderitem" data-param='{"orderby":"ordergoodsnum"}' class="{if !$orderby || $orderby=='ordergoodsnum desc'}selected desc{/if}{if $orderby=='ordergoodsnum asc'}selected asc{/if}">近30天下单商品数<i></i>
+                </a>
+            </th>
+            <th class="align-center">
+                <a title="点击进行排序" ds_type="orderitem" data-param='{"orderby":"ordergamount"}' class="{if $orderby=='ordergamount desc'}selected desc{/if}{if $orderby=='ordergamount asc'}selected asc{/if}">近30天下单金额<i></i>
+                </a>
+            </th>
+            <th class="w120">{$Think.lang.ds_handle}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="goodslist"}
+        {foreach name="goodslist" item="v"}
+        <tr class="bd-line">
+            <td>
+                <div class="pic-thumb">
+                    <a href="{:url('Goods/index',['goods_id'=>$v.goods_id])}" target="_blank">
+                        <img src="{:goods_thumb($v)}"/>
+                    </a>
+                </div>
+            </td>
+            <td class="tl">
+                <span class="over_hidden w400 h20">
+                    <a href="{:url('Goods/index',['goods_id'=>$v.goods_id])}" target="_blank">{$v.goods_name}</a>
+                </span>
+            </td>
+            <td>{$v.goods_price}</td>
+            <td>{$v.ordergoodsnum}</td>
+            <td>{$Think.lang.currency}{$v.ordergamount}</td>
+            <td>
+                <a href="javascript:void(0);" ds_type='showdata' data-param='{"gid":"{$v.goods_id}"}'>走势图</a>
+            </td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr>
+            <td colspan="20" class="norecord">
+                <div class="warning-option">
+                    <i class="fa fa-warning"></i>
+                    <span>{$Think.lang.no_record}</span>
+                </div>
+            </td>
+        </tr>
+        {/notempty}
+    </tbody>
+    {notempty name="goodslist"}
+    <tfoot>
+        <tr>
+            <td colspan="20"><div class="pagination">{$show_page}</div></td>
+        </tr>
+    </tfoot>
+    {/notempty}
+</table>
+<table class="dssc-default-table">
+    <tbody>
+        <tr>
+    <div id="goodsinfo_div" class="close_float" style="text-align:center;"></div>
+</tr>
+</tbody>
+</table>
+<script src="{$Think.PLUGINS_SITE_ROOT}/mlselection.js"></script>
+<script type="text/javascript">
+$(function(){
+    //商品分类
+    init_gcselect({$gc_choose_json},{$gc_json});
+
+    $('#query_start_date').datepicker({dateFormat: 'yy-mm-dd'});
+    $('#query_end_date').datepicker({dateFormat: 'yy-mm-dd'});
+
+    //加载商品详情
+    {notempty name="goodslist"}
+        getStatdata({$goodslist.0.goods_id});
+    {/notempty}
+    $("[ds_type='showdata']").click(function(){
+        var data_str = $(this).attr('data-param');
+        eval('data_str = '+data_str);
+        getStatdata(data_str.gid);
+    });
+    //排序
+    $("[ds_type='orderitem']").click(function(){
+        var data_str = $(this).attr('data-param');
+        eval( "data_str = "+data_str);
+        if($(this).hasClass('desc')){
+            $("#orderby").val(data_str.orderby + ' asc');
+        } else {
+            $("#orderby").val(data_str.orderby + ' desc');
+        }
+        $('#formSearch').submit();
+    });
+});
+function getStatdata(gid){
+    $('#goodsinfo_div').load(HOMESITEURL+'/Statisticsgoods/goodsinfo?gid='+gid);
+}
+</script>
+
+{/block}

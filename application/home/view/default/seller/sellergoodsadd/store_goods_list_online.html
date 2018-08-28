@@ -1,0 +1,171 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_btn"}
+ <a title="批量生成商品二维码" class="dssc-btn dssc-btn-green" href="{:url('Sellergoodsonline/maker_qrcode')}" target="_blank" style="right:100px" onclick="return confirm('您确定要执行批量生成二维码吗？');">批量生成商品二维码</a>
+            <a href="{:url('Sellergoodsadd/index')}" class="dssc-btn dssc-btn-green" title="{$Think.lang.store_goods_index_add_goods}"> {$Think.lang.store_goods_index_add_goods}</a>
+{/block}
+{block name="seller_main"}
+<form method="get" action="">
+  <table class="search-form">
+    <tr>
+      <td>&nbsp;</td>
+      <th>{$Think.lang.store_goods_index_store_goods_class}</th>
+      <td class="w160"><select name="storegc_id" class="w150">
+          <option value="0">{$Think.lang.ds_please_choose}</option>
+          {notempty name="store_goods_class"}
+          {foreach name="store_goods_class" item="val"}
+          <option value="{$val.storegc_id}" {if $Request.get.storegc_id == $val.storegc_id}selected=selected{/if}>{$val.storegc_name}</option>
+          {if isset($val['child']) && count($val['child'])>0}
+          {foreach name="$val.child" item="child_val"  }
+          <option value="{$child_val.storegc_id}" {if $Request.get.storegc_id == $child_val.storegc_id}selected=selected{/if}>&nbsp;&nbsp;&nbsp;&nbsp;{$child_val.storegc_name}</option>
+          {/foreach}
+          {/if}
+          {/foreach}
+          {/notempty}
+        </select></td>
+      <th> <select name="search_type">
+          <option value="0" {if condition="$Request.param.type eq '0'"}selected="selected"{/if}>{$Think.lang.store_goods_index_goods_name}</option>
+          <option value="1" {if condition="$Request.param.type eq '1'"}selected="selected"{/if}>{$Think.lang.store_goods_index_goods_no}</option>
+          <option value="2" {if condition="$Request.param.type eq '2'"}selected="selected"{/if}>平台货号</option>
+        </select>
+      </th>
+      <td class="w160"><input type="text" class="text w150" name="keyword" value="{$Request.param.keyword}"/></td>
+      <td class="tc w70"><label class="submit-border">
+          <input type="submit" class="submit" value="{$Think.lang.ds_search}" />
+        </label></td>
+    </tr>
+  </table>
+</form>
+        
+        
+<table class="dssc-default-table">
+  <thead>
+    <tr ds_type="table_header">
+      <th class="w30">&nbsp;</th>
+      <th class="w50">&nbsp;</th>
+      <th coltype="editable" column="goods_name" checker="check_required" inputwidth="230px">{$Think.lang.store_goods_index_goods_name}</th>
+      <th class="w100">{$Think.lang.store_goods_index_price}</th>
+      <th class="w100">{$Think.lang.store_goods_index_stock}</th>
+      <th class="w100">{$Think.lang.store_goods_index_add_time}</th>
+      <th class="w120">{$Think.lang.ds_handle}</th>
+    </tr>
+    {notempty name="goods_list"}
+    <tr>
+      <td class="tc"><input type="checkbox" id="all" class="checkall"/></td>
+      <td colspan="6"><label for="all" >{$Think.lang.ds_select_all}</label>
+          <a href="javascript:void(0);" class="dssc-btn-mini" ds_type="batchbutton" uri="{:url('Sellergoodsonline/drop_goods')}" name="commonid" confirm="{$Think.lang.ds_ensure_del}"><i class="fa fa-trash-o"></i>{$Think.lang.ds_del}</a>
+          <a href="javascript:void(0);" class="dssc-btn-mini" ds_type="batchbutton" uri="{:url('Sellergoodsonline/goods_unshow')}" name="commonid"><i class="fa fa-level-down"></i>{$Think.lang.store_goods_index_unshow}</a>
+          <a href="javascript:void(0);" class="dssc-btn-mini" dstype="batch" data-param="{urls:'{:url('Sellergoodsonline/edit_jingle')}', sign:'jingle'}"><i></i>设置广告词</a>
+          <a href="javascript:void(0);" class="dssc-btn-mini" dstype="batch" data-param="{urls:'{:url('Sellergoodsonline/edit_plate')}', sign:'plate'}"><i></i>设置关联版式</a>
+      </td>
+    </tr>
+    {/notempty}
+  </thead>
+  <tbody>
+    {notempty name="goods_list"}
+    {foreach name="goods_list" item="val" }
+    <tr>
+      <th class="tc"><input type="checkbox" class="checkitem tc" {if $val.goods_lock == 1}disabled="disabled"{/if} value="{$val.goods_commonid}"/></th>
+      <th colspan="6">平台货号：{$val.goods_commonid}</th>
+    </tr>
+    <tr>
+      <td class="trigger"><i class="tip fa fa-plus-square" dstype="ajaxGoodsList" data-comminid="{$val.goods_commonid}" title="点击展开查看此商品全部规格；规格值过多时请横向拖动区域内的滚动条进行浏览。"></i></td>
+      <td><div class="pic-thumb"><a href="{:url('Goods/index',['goods_id'=>$storage_array[$val['goods_commonid']]['goods_id']])}" target="_blank"><img src="{:goods_thumb($val, 240)}"/></a></div></td>
+      <td class="tl"><dl class="goods-name">
+          <dt style="max-width: 450px !important;">
+            {if $val.is_virtual ==1}
+            <span class="type-virtual" title="虚拟兑换商品">虚拟</span>
+            {/if}
+            {if $val.is_goodsfcode ==1}
+            <span class="type-fcode" title="F码优先购买商品">F码</span>
+            {/if}
+            {if $val.is_presell ==1}
+            <span class="type-presell" title="预先发售商品">预售</span>
+            {/if}
+            {if $val.is_appoint ==1}
+            <span class="type-appoint" title="预约销售提示商品">预约</span>
+            {/if}
+            <a href="{:url('Goods/index',['goods_id'=>$storage_array[$val['goods_commonid']]['goods_id']])}" target="_blank">{$val.goods_name}</a></dt>
+          <dd>{$Think.lang.store_goods_index_goods_no}{$Think.lang.ds_colon}{$val.goods_serial}</dd>
+          <dd class="serve"> <span class="{if $val.goods_commend == 1}open{/if}" title="店铺推荐商品"><i class="commend">荐</i></span> <span class="{if $val.mobile_body != ''}open{/if}" title="手机端商品详情"><i class="fa fa-tablet"></i></span> <span class="" title="商品页面二维码"><i class="fa fa-qrcode"></i>
+            <div class="QRcode"><a target="_blank" href="{:goods_qrcode(array('goods_id' => $storage_array[$val['goods_commonid']]['goods_id'], 'store_id' => session('store_id')))}">下载标签</a>
+              <p><img src="{:goods_qrcode(array('goods_id' => $storage_array[$val['goods_commonid']]['goods_id'], 'store_id' => session('store_id')))}"/></p>
+            </div>
+            </span>
+            {if $val.is_goodsfcode ==1}
+            <span><a class="dssc-btn-mini dssc-btn-red" href="{:url('Sellergoodsonline/download_f_code_excel',['commonid'=>$val.goods_commonid])}">下载F码</a></span>
+            {/if}
+          </dd>
+        </dl></td>
+      <td><span>{$Think.lang.currency}{$val.goods_price}</span></td>
+      <td><span {if isset($storage_array[$val['goods_commonid']]['alarm'])}style="color:red;"{/if}>{$storage_array[$val['goods_commonid']]['sum']}{$Think.lang.piece}</span></td>
+      <td class="goods-time">{$val.goods_addtime|date="Y-m-d",###}</td>
+      <td class="nscs-table-handle">
+        {if $val.goods_lock == 0}
+        <span><a href="{:url('Sellergoodsonline/edit_goods',['commonid'=>$val.goods_commonid])}" class="btn-blue"><i class="fa fa-pencil-square"></i>
+        <p>{$Think.lang.ds_edit}</p>
+        </a></span> <span><a href="javascript:void(0);" onclick="ajax_get_confirm('{$Think.lang.ds_ensure_del}', '{:url('Sellergoodsonline/drop_goods',['commonid'=>$val.goods_commonid])}');" class="btn-red"><i class="fa fa-trash-o"></i>
+        <p>{$Think.lang.ds_del}</p>
+        </a></span>
+        {else /}
+        <span class="tip" title="该商品参加抢购活动期间不能进行编辑及删除等操作,可以编辑赠品和推荐组合"><a href="{if $val.is_virtual ==1 }javascript:void(0);{else/}{:url('Sellergoodsonline/add_gift',['commonid'=>$val['goods_commonid']])}{/if}" class="btn-orange-current"><i class="fa fa-lock"></i>
+        <p>锁定</p>
+        </a></span>
+        {/if}
+      </td>
+    </tr>
+    <tr style="display:none;">
+      <td colspan="7"><div class="dssc-goods-sku ps-container"></div></td>
+    </tr>
+    {/foreach}
+    {else /}
+    <tr>
+      <td colspan="7" class="norecord"><div class="warning-option"><i class="fa fa-warning"></i><span>{$Think.lang.no_record}</span></div></td>
+    </tr>
+    {/notempty}
+  </tbody>
+  <tfoot>
+    {notempty name="goods_list"}
+    <tr>
+      <th class="tc"><input type="checkbox" id="all2" class="checkall"/></th>
+      <th colspan="6"><label for="all2">{$Think.lang.ds_select_all}</label>
+        <a href="javascript:void(0);" ds_type="batchbutton" uri="{:url('Sellergoodsonline/drop_goods')}" name="commonid" confirm="{$Think.lang.ds_ensure_del}" class="dssc-btn-mini"><i class="fa fa-trash-o"></i>{$Think.lang.ds_del}</a>
+        <a href="javascript:void(0);" ds_type="batchbutton" uri="{:url('Sellergoodsonline/goods_unshow')}" name="commonid" class="dssc-btn-mini"><i class="fa fa-level-down"></i>{$Think.lang.store_goods_index_unshow}</a>
+        <a href="javascript:void(0);" class="dssc-btn-mini" dstype="batch" data-param="{urls:'{:url('Sellergoodsonline/edit_jingle')}', sign:'jingle'}"><i></i>设置广告词</a>
+        <a href="javascript:void(0);" class="dssc-btn-mini" dstype="batch" data-param="{urls:'{:url('Sellergoodsonline/edit_plate')}', sign:'plate'}"><i></i>设置关联版式</a>
+      </th>
+    </tr>
+    <tr>
+      <td colspan="7"><div class="pagination"> {$show_page}</div></td>
+    </tr>
+    {/notempty}
+  </tfoot>
+</table>
+        <script src="{$Think.HOME_SITE_ROOT}/js/store_goods_list.js"></script> 
+
+<script>
+    $(function(){
+        $('a[dstype="batch"]').click(function(){
+            if($('.checkitem:checked').length == 0){    //没有选择
+                showDialog('请选择需要操作的记录');
+                return false;
+            }
+            var _items = '';
+            $('.checkitem:checked').each(function(){
+                _items += $(this).val() + ',';
+            });
+            _items = _items.substr(0, (_items.length - 1));
+
+            var data_str = '';
+            eval('data_str = ' + $(this).attr('data-param'));
+
+            if (data_str.sign == 'jingle') {
+                ajax_form('ajax_jingle', '设置广告词', data_str.urls + '?commonid=' + _items + '&inajax=1', '480');
+            } else if (data_str.sign == 'plate') {
+                ajax_form('ajax_plate', '设置关联版式', data_str.urls + '?commonid=' + _items + '&inajax=1', '480');
+            }
+        });
+    });
+</script>
+
+
+{/block}

@@ -1,0 +1,61 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<div class="alert alert-block mt10"> <strong>说明：</strong>
+    <ul class="mt5">
+        <li>1、管理员可以看见全部消息。</li>
+        <li>2、只有管理员可以删除消息，删除后其他账户的该条消息也将被删除。</li>
+    </ul>
+</div>
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w30"></th>
+            <th>消息内容</th>
+            <th class="w200">发送时间</th>
+            <th class="w70">操作</th>
+        </tr>
+        <tr>
+            <td class="tc"><input id="all" class="checkall" type="checkbox" /></td>
+            <td colspan="20"><label for="all">全选</label>
+                <a href="javascript:void(0);" ds_type="batchbutton" uri="{:url('Sellermsg/mark_as_read')}" name="smids" class="dssc-btn-mini"><i class="fa fa-flag"></i>标记为已读</a>
+                {if session('seller_is_admin')}
+                <a href="javascript:void(0);" ds_type="batchbutton" uri="{:url('Sellermsg/del_msg')}" name="smids" class="dssc-btn-mini"><i class="fa fa-trash-o"></i>删除</a>
+                {/if}
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="msg_list"}
+        {foreach name="msg_list" item="val"}
+        <tr class="bd-line">
+            <td class="tc"><input class="checkitem" type="checkbox" value="{$val.storemsg_id}" /></td>
+            <td class="tl {if empty($val['storemsg_readids']) || !in_array(session('seller_id'), $val['storemsg_readids'])}fb dark{/if}">{$val.storemsg_content}</td>
+            <td>{:date('Y-m-d H:i:s',$val.storemsg_addtime)}</td>
+            <td class="dssc-table-handle"><span><a href="javascript:void(0);" class="btn-blue" dialog_id="store_msg_info" dialog_title="系统消息" dialog_width="480" ds_type="dialog" uri="{:url('Sellermsg/msg_info',['storemsg_id'=>$val.storemsg_id])}"><i class="fa fa-eye"></i>
+                        <p>查看</p>
+                    </a></span></td>
+        </tr>
+        {/foreach}
+        {else}
+        <tr>
+            <td colspan="20" class="norecord"><div class="warning-option"><i class="fa fa-warning"></i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="msg_list"}
+        <tr>
+            <td colspan="20"><div class="pagination">{$show_page}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+<script>
+    $(function () {
+        $('a[ds_type="dialog"]').click(function () {
+            $(this).parents('tr:first').children('.tl').removeClass('fb dark');
+        });
+    });
+</script>
+{/block}

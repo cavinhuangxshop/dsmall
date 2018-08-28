@@ -1,0 +1,162 @@
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/member_snsshare.css">
+<div class="dialog-share">
+  <form method="post" action="{:url('Membersnsindex/sharestore')}" id="sharestore_form">
+    <input type="hidden" id="choosestoreid" name="choosestoreid" value="{$store_info.store_id}" />
+    <!--分享范围设置-->
+    <div class="share-set">
+      <div class="share-widget">{$Think.lang.sharebind_alsoshareto}
+        <ul class="s-app">
+          <li title="个人中心"><i></i></li>
+          {if config('share_isuse') == 1}
+          {notempty name="app_arr"}
+          {foreach name="app_arr" item="v" key="k" }
+          <li ds_type="appitem_{$k}" title="{$v.name}" class="{if $v.isbind}checked{else/}disable{/if}"> <i class="i-{$k}" ds_type="bindbtn" data-param='{"apikey":"{$k}","apiname":"{$v.name}"}' attr_isbind="{if $v.isbind}1{else/}0{/if}"></i>
+            <input type="hidden" id="checkapp_{$k}" name="checkapp_{$k}" value="{if $v.isbind}1{else/}0{/if}" />
+          </li>
+          {/foreach}
+          {/notempty}
+          <div class="tip"><span class="arrow"></span>点亮图标分享商品到热门社交网络去~<a target="_blank" href="{:url('Membersharemanage/index')}">{$Think.lang.sharebind_alsosharesetting}</a></div>
+          {/if}
+        </ul>
+      </div>
+      <div ds_type="formprivacydiv" class="share-privacy"><a href="javascript:void(0);" ds_type="formprivacybtn"><i class="fa fa-group"></i>可见范围</a>
+        <div class="privacytab" ds_type="formprivacytab" style="display:none;"> <span class="arrow"></span>
+          <ul>
+            <li ds_type="formprivacyoption" data-param='{"v":"0","hiddenid":"gprivacy"}'><span class="selected"></span>{$Think.lang.sns_weiboprivacy_all}</li>
+            <li ds_type="formprivacyoption" data-param='{"v":"1","hiddenid":"gprivacy"}'><span></span>{$Think.lang.sns_weiboprivacy_friend}</li>
+            <li ds_type="formprivacyoption" data-param='{"v":"2","hiddenid":"gprivacy"}'><span></span>{$Think.lang.sns_weiboprivacy_self}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!--分享内容-->
+    <div class="share-content">
+      <div id="sscharcount" class="textarea-count"></div>
+      <div class="avatar"><img src="{:get_member_avatar($member_info['member_avatar'])}"><i></i></div>
+      <textarea placeholder="{$Think.lang.sns_sharestore_contenttip}" class="textarea" name="comment" id="content_ssweibo" resize="none" ></textarea>
+      <div class="share-goods">
+        <div class="goods-thumb"><a target="_blank" href="{$store_info.store_url}"><img title="{$store_info.store_name}" src="{:get_store_logo($store_info['store_avatar'])}"/></a></div>
+        <dl class="goods-intro">
+          <dt><a target="_blank" href="{$store_info.store_url}">{$store_info.store_name}</a></dt>
+          <dd>{$store_info.area_info}</dd>
+          <dd>{$store_info.member_name}</dd>
+        </dl>
+      </div>
+      <div class="error form-error"></div>
+    </div>
+    
+    <!-- 验证码 -->
+    <div id="ss_seccode" class="seccode">{$Think.lang.ds_checkcode}{$Think.lang.ds_colon}
+      <input name="captcha" class="text" type="text" size="4" maxlength="4"/>
+      <img src="" title="{$Think.lang.wrong_checkcode_change}" name="codeimage" onclick="this.src='{:captcha_src()}'"/><span>{$Think.lang.wrong_seccode}</span>
+    </div>
+    <input type="text" style="display:none;" />
+    <!-- 防止点击Enter键提交 -->
+    <div class="bottom">
+      <input name="{$Think.lang.ds_snsshare}" type="button" class="button" value="{$Think.lang.ds_snsshare}" id="weibobtn_store" />
+      <a href="javascript:DialogManager.close('sharestore');" class="cancel">取消</a> </div>
+    <input type="hidden" name="sprivacy" id="sprivacy" value="0"/>
+  </form>
+</div>
+<textarea id="bindtooltip_module" style="display:none;"><div class="bindtooltip"><dl><dt><img src="{$Think.HOME_SITE_ROOT}/images/member/shareicon/shareicon_@apikey.png"></dt>
+<dd><p>{$Think.lang.sharebind_list_popup_tip1}<strong class="ml5 mr5">@apiname</strong>{$Think.lang.sharebind_list_popup_tip2}</p><p class="hint">{$Think.lang.sharebind_list_popup_tip3}@apiname{$Think.lang.sharebind_list_popup_tip4}</p></dd></dl><div class="bottom"><a href="javascript:void(0);" ds_type="finishbtn" data-param='{"apikey":"@apikey"}' class="mini-btn">{$Think.lang.sharebind_list_finishbind}</a><span>{$Think.lang.sharebind_list_unfinishedbind}<a target="_blank" href="{:url('Api/sharebind',['type'=>'@apikey'])}">{$Think.lang.sharebind_list_againbind}</a></span></div></div></textarea>
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns.js" charset="utf-8"></script> 
+<script>
+var max_recordnum = '{$max_recordnum}';
+$(function(){
+    $.getScript('{$Think.PLUGINS_SITE_ROOT}/jquery.charCount.js', function(){
+        //分享店铺评论字符个数计算
+        $("#content_ssweibo").charCount({
+            allowed: 140,
+            warning: 10,
+            counterContainerID:'sscharcount',
+            firstCounterText:'{$Think.lang.sns_charcount_tip1}',
+            endCounterText:'{$Think.lang.sns_charcount_tip2}',
+            errorCounterText:'{$Think.lang.sns_charcount_tip3}'
+        });
+    });
+	//分享店铺表单验证
+	$('#sharestore_form').validate({
+		errorPlacement: function(error, element){
+			element.next('.error').append(error);
+	    },      
+	    rules : {
+	    	comment : {
+	            maxlength : 140
+	        }
+	    },
+	    messages : {
+	    	comment : {
+	            maxlength: '{$Think.lang.sns_content_beyond}'
+	        }
+	    }
+	});
+
+	//提交分享店铺表单
+	$("#weibobtn_store").click(function(){
+		if($("#sharestore_form").valid()){
+			var cookienum = $.cookie('weibonum');
+			cookienum = parseInt(cookienum);
+			if(cookienum >= max_recordnum && $("#ss_seccode").css('display') == 'none'){
+				//显示验证码
+				$("#ss_seccode").show();
+				$("#ss_seccode").find("[name='codeimage']").attr('src','{:captcha_src()}');
+			}else if(cookienum >= max_recordnum && $("#ss_seccode").find("[name='captcha']").val() == ''){
+				showDialog('{$Think.lang.wrong_null}');
+			}else{
+				ajaxpost('sharestore_form', '', '', 'onerror');
+				//隐藏验证码
+				$("#ss_seccode").hide();
+				$("#ss_seccode").find("[name='codeimage']").attr('src','');
+				$("#ss_seccode").find("[name='captcha']").val('');
+			}
+		}
+		return false;
+	});
+	$("[ds_type='bindbtn']").bind('click',function(){
+		var data_str = $(this).attr('data-param');
+	    eval( "data_str = "+data_str);
+	    //判断是否已经绑定
+	    var isbind = $(this).attr('attr_isbind');
+	    if(isbind == '1'){
+                //已经绑定
+		    if($("#checkapp_"+data_str.apikey).val() == '1'){
+			    $("[ds_type='appitem_"+data_str.apikey+"']").removeClass('checked');
+		    	$("[ds_type='appitem_"+data_str.apikey+"']").addClass('disable');
+            	$("#checkapp_"+data_str.apikey).val('0');
+			}else{
+				$("[ds_type='appitem_"+data_str.apikey+"']").removeClass('disable');
+            	$("[ds_type='appitem_"+data_str.apikey+"']").addClass('checked');
+            	$("#checkapp_"+data_str.apikey).val('1');
+			}
+		}else{
+			var html = $("#bindtooltip_module").text();
+		    //替换关键字
+		    html = html.replace(/@apikey/g,data_str.apikey);
+		    html = html.replace(/@apiname/g,data_str.apiname);
+		    html_form("bindtooltip", "{$Think.lang.sharebind_list_accountconnect}", html, 360, 0);	    
+		    window.open(HOMESITEURL+'/api/sharebind.html?type='+data_str.apikey);
+		}
+	});
+	$("[ds_type='finishbtn']").on('click',function(){
+		var data_str = $(this).attr('data-param');
+	    eval( "data_str = "+data_str);
+		//验证是否绑定成功
+		var url = "{:url('Membersharemanage/checkbind')}";
+        $.getJSON(url, {'k':data_str.apikey}, function(data){
+        	DialogManager.close('bindtooltip');
+            if (data.done)
+            {
+            	$("[ds_type='appitem_"+data_str.apikey+"']").addClass('check');
+            	$("[ds_type='appitem_"+data_str.apikey+"']").removeClass('disable');
+            	$('#checkapp_'+data_str.apikey).val('1');
+            	$("[ds_type='appitem_"+data_str.apikey+"']").find('i').attr('attr_isbind','1');
+            }
+            else
+            {
+            	showDialog(data.msg, 'notice');
+            }
+        });
+	});
+});
+</script> 

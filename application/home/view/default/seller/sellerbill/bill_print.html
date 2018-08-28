@@ -1,0 +1,22 @@
+<link href="{$Think.HOME_SITE_ROOT}/css/base.css" rel="stylesheet" type="text/css">
+<table style="width:800px;font-size:15px;line-height:40px;margin-top:50px;" align="center">
+    <tr><td colspan="2"><img height="32" src="{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_COMMON}/{$Think.config.site_logo}"></td></tr>
+    <tr><td colspan="4" style="border-bottom:1px solid #ccc"><h3 style="font-size:20px;line-height:60px">{$Think.config.site_name} - 实物订单商家结算单</h3></td></tr>
+    <tr>
+        <td width="80px">商家</td><td colspan="3">{$bill_info.ob_store_name}</td>
+    </tr>
+    <tr><td>结算单号</td><td width="130px">{$bill_info.ob_no}</td><td width="100px">结算范围</td><td>{$bill_info.ob_startdate|date="Y-m-d",###} &nbsp;至&nbsp; {$bill_info.ob_enddate|date="Y-m-d",###}</td></tr>
+    <tr><td>出账时间</td><td>{$bill_info.ob_createdate|date="Y-m-d",###}</td>
+        <td>结算状态</td><td>{:get_bill_state($bill_info['ob_state'])}</td>
+    </tr>
+    {if $bill_info['ob_state'] == BILL_STATE_SUCCESS}
+    <tr>
+        <td>
+            结算日期</td><td>{$bill_info.ob_paydate|date="Y-m-d",###}
+        </td>
+    </tr>
+    {/if}
+    <tr><td>商家应收</td><td colspan="3">{$bill_info.ob_result_totals}</td></tr>
+    <tr><td>结算明细</td><td colspan="3"></td></tr>
+    <tr><td colspan="4">{$bill_info.ob_order_totals} (订单金额) - {$bill_info.ob_commis_totals} (佣金金额) - {$bill_info.ob_order_return_totals} (退单金额) + {$bill_info.ob_commis_return_totals} (退还佣金) - {$bill_info.ob_store_cost_totals} (店铺促销费用)</td></tr>
+</table>

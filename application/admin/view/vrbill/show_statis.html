@@ -1,0 +1,104 @@
+{include file="public/header" /}
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>虚拟订单结算</h3>
+                <h5></h5>
+            </div>
+            <ul class="tab-base">
+                <li><a href="{:url('Vrbill/index')}"><span>结算管理</span></a></li>
+                <li><a class="current" href="JavaScript:void(0);"><span>{if $Request.get.os_month}{$Request.get.os_month}期{/if} 商家账单列表</span></a></li>
+            </ul>
+        </div>
+    </div>
+  <div class="fixed-empty"></div>
+  
+  <form method="get" name="formSearch" id="formSearch">
+      <input type="hidden" name="os_month" value="{$Request.get.os_month}">
+      <div class="ds-search-form">
+          <dl>
+              <dt>店铺ID/名称</dt>
+              <dd><input class="txt-short" type="text" value="{$Request.get.query_store}" name="query_store" id="query_store"/></dd>
+          </dl> 
+          <dl>
+              <dt>账单状态</dt>
+              <dd>
+                  <select name="bill_state">
+                      <option>{$Think.lang.ds_please_choose}</option>
+                      <option {if $Request.get.bill_state == $Think.BILL_STATE_CREATE}selected{/if} value="{$Think.BILL_STATE_CREATE}">已出账</option>
+                      <option {if $Request.get.bill_state == $Think.BILL_STATE_STORE_COFIRM}selected{/if} value="{$Think.BILL_STATE_STORE_COFIRM}">商家已确认</option>
+                      <option {if $Request.get.bill_state == $Think.BILL_STATE_SYSTEM_CHECK}selected{/if} value="{$Think.BILL_STATE_SYSTEM_CHECK}">平台已审核</option>
+                      <option {if $Request.get.bill_state == $Think.BILL_STATE_SUCCESS}selected{/if} value="{$Think.BILL_STATE_SUCCESS}">结算完成</option>
+                  </select>
+              </dd> 
+          </dl>
+          <div class="btn_group">
+              <a href="javascript:document.formSearch.submit();" class="btn" title="{$Think.lang.ds_query}">{$Think.lang.ds_query}</a>
+          </div>
+      </div>
+  </form>
+  
+  <div class="explanation" id="explanation">
+      <div class="title" id="checkZoom">
+          <h4 title="{$Think.lang.ds_explanation_tip}">{$Think.lang.ds_explanation}</h4>
+          <span id="explanationZoom" title="{$Think.lang.ds_explanation_close}" class="arrow"></span>
+      </div>
+      <ul>
+          <li>此处列出了详细的店铺账单信息，点击查看可以查看详细的订单信息、退单信息和店铺费用信息</li>
+          <li>账单处理流程为：系统出账 > 商家确认 > 平台审核 > 财务支付(完成结算) 4个环节，其中平台审核和财务支付需要平台介入，请予以关注</li>
+      </ul>
+  </div>
+  
+  
+  <table class="ds-default-table nobdb">
+    <thead>
+      <tr class="thead">
+        <th>账单编号</th>
+        <th class="align-center">开始日期</th>
+        <th class="align-center">结束日期</th>
+        <th class="align-center">消费金额</th>
+        <th class="align-center">佣金金额</th>
+        <th class="align-center">本期应结</th>
+        <th class="align-center">出账日期</th>
+        <th class="align-center">账单状态</th>
+        <th class="align-center">店铺</th>
+        <th class="align-center">{$Think.lang.ds_handle}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {notempty name="bill_list"}
+      {foreach name="bill_list" item="bill_info"}
+      <tr class="hover">
+        <td>{$bill_info.vrob_no}</td>
+        <td class="nowrap align-center">{$bill_info.vrob_startdate|date="Y-m-d",###}</td>
+        <td class="nowrap align-center">{$bill_info.vrob_enddate|date="Y-m-d",###}</td>
+        <td class="align-center">{$bill_info.vrob_order_totals}</td>
+        <td class="align-center">{$bill_info.vrob_commis_totals}</td>        
+        <td class="align-center">{$bill_info.vrob_result_totals}</td>
+        <td class="align-center">{$bill_info.vrob_createdate|date="Y-m-d",###}</td>
+        <td class="align-center">{:get_bill_state($bill_info['vrob_state'])}</td>
+        <td class="align-center">{$bill_info.vrob_store_name}<br/>id:{$bill_info.vrob_store_id}</td>
+        <td class="align-center">
+        <a href="{:url('Vrbill/show_bill',['ob_no'=>$bill_info.vrob_no])}" class="dsui-btn-view"><i class="fa"></i>{$Think.lang.ds_view}</a>
+        </td>
+      </tr>
+      {/foreach}
+      {else /}
+      <tr class="no_data">
+        <td colspan="15">{$Think.lang.ds_no_record}</td>
+      </tr>
+      {/notempty}
+    </tbody>
+    <tfoot>
+      <tr class="tfoot">
+        <td colspan="15" id="dataFuncs">{$show_page}</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+<script type="text/javascript">
+$(function(){
+    $('#bill_month').datepicker({dateFormat:'yy-mm'});
+});
+</script> 

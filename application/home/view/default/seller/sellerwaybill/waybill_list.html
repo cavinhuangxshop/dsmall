@@ -1,0 +1,65 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_btn"}<a title="建立模板" class="dssc-btn dssc-btn-green" href="{:url('Sellerwaybill/waybill_add')}">添加模板</a>{/block}
+{block name="seller_main"}
+
+<div class="alert alert-block mt10">
+    <ul class="mt5">
+        <li>1、商家已经建立的打印模板列表</li>
+        <li>2、点击右上角的添加模板按钮可以建立商家自己的模板</li>
+        <li>3、点击设计按钮可以对运单模板布局进行设计，点击测试按钮可以对模板进行打印测试，点击编辑按钮可以对模板参数进行调整</li>
+        <li>4、设计完成后在编辑中修改模板状态为启用后，商家就可以绑定该模板进行运单打印</li>
+        <li>5、点击删除按钮可以删除现有模板，删除后该模板将自动解除绑定，请慎重操作</li>
+    </ul>
+</div>
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w30"></th>
+            <th class="w120 tl">模板名称</th>
+            <th class="w120 tl">物流公司</th>
+            <th class="tl">运单图例</th>
+            <th class="w80">上偏移量</th>
+            <th class="w80">左偏移量</th>
+            <th class="w80">启用</th>
+            <th class="w200">{$Think.lang.ds_common_button_operate}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {if $waybill_list}
+        {foreach name="waybill_list" item="data"}
+        <tr class="bd-line">
+            <td></td>
+            <td class="tl">{$data.waybill_name}</td>
+            <td class="tl">{$data.express_name}</td>
+            <td class="tl"><div class="waybill-img-thumb"><a data-lightbox="lightbox-image" href="{$data.waybill_image_url}"><img src="{$data.waybill_image_url}"></a></div>
+                <div class="waybill-img-size">
+                    <p>宽度：{$data.waybill_width}(mm)</p>
+                    <p>高度：{$data.waybill_height}(mm)</p>
+                </div></td>
+            </td>
+            <td>{$data.waybill_top}</td>
+            <td>{$data.waybill_left}</td>
+            <td>{$data.waybill_usable_text}</td>
+            <td class="nscs-table-handle"><span><a href="{:url('Sellerwaybill/waybill_design',array('waybill_id' => $data.waybill_id))}" class="btn-orange"><i class="fa fa-pencil-square"></i>
+                        <p>设计</p>
+                    </a></span><span><a href="{:url('Sellerwaybill/waybill_test',array('waybill_id' =>$data.waybill_id))}" class="btn-acidblue" target="_blank"><i class="fa fa-print"></i>
+                        <p>测试</p>
+                    </a></span><span><a href="{:url('Sellerwaybill/waybill_edit',array('waybill_id' =>$data.waybill_id))}" class="btn-blue"><i class="fa fa-pencil-square"></i>
+                        <p>编辑</p>
+                    </a></span><span><a href="{:url('Sellerwaybill/waybill_del',array('waybill_id'=>$data.waybill_id))}"  class="btn-red"><i class="fa fa-trash-o"></i>
+                        <p>删除</p>
+                    </a></span></td>
+        </tr>
+        {/foreach}
+        {else}
+        <tr>
+            <td colspan="20" class="norecord"><div class="warning-option"><i class="fa fa-warning"></i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/if}
+    </tbody>
+</table>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/css/lightbox.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/js/lightbox.min.js"></script>
+
+
+{/block}

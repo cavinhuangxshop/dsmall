@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>{$html_title|default=$Think.config.site_name}</title>
+        <meta name="renderer" content="webkit|ie-comp|ie-stand" />
+        <meta name="keywords" content="{$seo_keywords|default=''}" />
+        <meta name="description" content="{$seo_description|default=''}" />
+        <link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/common.css">
+        <link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home_header.css">
+        <link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/font-awesome/css/font-awesome.min.css">
+        <script>
+            var BASESITEROOT = "{$Think.BASE_SITE_ROOT}";
+            var HOMESITEROOT = "{$Think.HOME_SITE_ROOT}";
+            var BASESITEURL = "{$Think.BASE_SITE_URL}";
+            var HOMESITEURL = "{$Think.HOME_SITE_URL}";
+        </script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/jquery-2.1.4.min.js"></script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/common.js"></script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery-ui/jquery-ui.min.js"></script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/jquery.validate.min.js"></script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/js/dialog/dialog.js" id="dialog_js" charset="utf-8"></script>
+    </head>
+    <body>
+        <div id="append_parent"></div>
+        <div id="ajaxwaitid"></div>
+        <div class="public-top">
+            <div class="w1200">
+                <span class="top-link">
+                    您好，欢迎来到 <em>{$Think.config.site_name}</em>
+                </span>
+                <ul class="login-regin">
+                    {if $Think.session.member_id}
+                    <li class="line"> <a href="{:url('Member/index')}">{$Think.session.member_name}</a></li>
+                    <li> <a href="{:url('Login/Logout')}">退出</a></li>
+                    {else}
+                    <li class="line"> <a href="{:url('Login/login')}">请登录</a></li>
+                    <li> <a href="{:url('Login/register')}">免费注册</a></li>
+                    {/if}
+                </ul>
+                <span class="top-link">
+                    <strong style="margin-left:30px;">关注<a href="http://www.csdeshang.com" target="_blank">www.csdeshang.com</a> 持续更新</strong>&nbsp;
+                    购买授权：<a target="_blank" href="{$Think.HTTP_TYPE}wpa.qq.com/msgrd?v=3&uin=858761000&site=qq&menu=yes"><img border="0" src="{$Think.HTTP_TYPE}wpa.qq.com/pa?p=2:858761000:51" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
+                    二次开发<a target="_blank" href="{$Think.HTTP_TYPE}wpa.qq.com/msgrd?v=3&uin=181814630&site=qq&menu=yes"><img border="0" src="{$Think.HTTP_TYPE}wpa.qq.com/pa?p=2:181814630:51" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
+                </span>
+                <ul class="quick_list">
+                    <li>
+                        <span class="outline"></span>
+                        <span class="blank"></span>
+                        <a href="{:url('Member/index')}">用户中心<b></b></a>
+                        <div class="dropdown-menu">
+                            <ol>
+                                <li><a href="{:url('Memberorder/index')}">已买到的商品</a></li>
+                                <li><a href="{:url('Memberfavorites/fglist')}">我关注的商品</a></li>
+                                <li><a href="{:url('Memberfavorites/fslist')}">我关注的店铺</a></li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="outline"></span>
+                        <span class="blank"></span>
+                        <a href="{:url('Seller/index')}">商家中心<b></b></a>
+                        <div class="dropdown-menu">
+                            <ol>
+                                {if $Think.session.seller_id}
+                                <li><a href="{:url('Seller/index')}">店铺概览</a></li>
+                                <li><a href="{:url('Sellerorder/index')}">订单管理</a></li>
+                                <li><a href="{:url('Sellergoodsonline/index')}">商品管理</a></li>
+                                {else /}
+                                <li><a href="{:url('Showjoinin/index')}">商家入驻</a></li>
+                                <li><a href="{:url('Sellerlogin/login')}">商家登录</a></li>
+                                {/if}
+                            </ol>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="outline"></span>
+                        <span class="blank"></span>
+                        <a href="{:url('Memberfavorites/fglist')}">我的收藏<b></b></a>
+                        <div class="dropdown-menu">
+                            <ol>
+                                <li><a href="{:url('Memberfavorites/fglist')}">商品收藏</a></li>
+                                <li><a href="{:url('Memberfavorites/fslist')}">店铺收藏</a></li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="outline"></span>
+                        <span class="blank"></span>
+                        <a href="javascript:void(0)">客户中心<b></b></a>
+                        <div class="dropdown-menu">
+                            <ol>
+                                <li><a href="{:url('Article/index',['ac_id'=>2])}">帮助中心</a></li>
+                                <li><a href="{:url('Article/index',['ac_id'=>5])}">售后服务</a></li>
+                                <li><a href="{:url('Article/index',['ac_id'=>6])}">投诉中心</a></li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li class="moblie-qrcode">
+                        <span class="outline"></span>
+                        <span class="blank"></span>
+                        <a href="javascript:void(0)">微信端</a>
+                        <div class="dropdown-menu">
+                            <img src="{$Think.config.url_attach_common}/{$Think.config.site_logowx}" width="90" height="90" />
+                        </div>
+                    </li>
+                    <!--
+                    <li class="app-qrcode">
+                        <span class="outline"></span>
+                        <span class="blank"></span>
+                        <a href="javascript:void(0)">APP</a>
+                        <div class="dropdown-menu">
+                            <img width="90" height="90" src="{$Think.config.url_attach_common}/{$Think.config.site_logowx}" />
+                            <h3>扫描二维码</h3>
+                            <p>下载手机客户端</p>
+                        </div>
+                    </li>
+                    -->
+                </ul>
+            </div>
+        </div>
+        
+        
+        
+        <!--左侧导航栏-->
+<div class="ds-appbar">
+    <div class="ds-appbar-tabs" id="appBarTabs">
+        {if $Think.session.is_login}
+        <div class="user" dstype="a-barUserInfo">
+            <div class="avatar"><img src="{:get_member_avatar($Think.session.avatar)}"/></div>
+            <p>我</p>
+        </div>
+        <div class="user-info" dstype="barUserInfo" style="display:none;"><i class="arrow"></i>
+            <div class="avatar"><img src="{:get_member_avatar($Think.session.avatar)}"/></div>
+            <dl>
+                <dt>Hi, {$Think.session.member_name}</dt>
+                <dd>当前等级：<strong dstype="barMemberGrade">{$Think.session.level_name}</strong></dd>
+                <dd>当前经验值：<strong dstype="barMemberExp">{$Think.session.member_exppoints}</strong></dd>
+            </dl>
+        </div>
+       {else /}
+        <div class="user TA_delay" dstype="a-barLoginBox">
+            <div class="avatar TA"><img src="{:get_member_avatar($Think.session.avatar)}"/></div>
+            <p class="TA">未登录</p>
+        </div>
+        {/if}
+        <ul class="tools">
+            {if $Think.config.node_site_use eq '1'}
+            <li><a href="javascript:void(0);" id="chat_show_user" class="chat TA_delay"><span class="fa fa-commenting"></span><span class="tit">聊天</span><i id="new_msg" class="new_msg" style="display:none;"></i></a></li>
+            {/if}
+            <li><a href="javascript:void(0);" onclick="toglle_bar('rtoolbar_cart')" id="rtoolbar_cart" class="cart TA_delay"><span class="fa fa-shopping-cart"></span><span class="tit">购物车</span><i id="rtoobar_cart_count" class="new_msg" style="display:none;"></i></a></li>
+            <li><a href="javascript:void(0);" onclick="toglle_bar('compare')" id="compare" class="compare TA_delay"><span class="fa fa-exchange"></span><span class="tit">对比</span></a></li>
+            <li>
+                <a href="javascript:void(0);" id="qrcode" class="qrcode TA_delay"><span class="fa fa-qrcode"></span>
+                    <span class="tit tit-box">
+                        手机购物更优惠<br>
+                        <img src="{$Think.const.HOME_SITE_URL}/qrcode?url={$Think.const.WAP_SITE_URL}" width="110" height="110" />
+                        <em class="tips_arrow"></em>
+                    </span>
+                </a>
+            </li>
+            <li><a href="javascript:void(0);" onclick="$('html,body').animate({scrollTop: '0px'}, 500)" id="gotop" class="gotop TA_delay" style="position: fixed;bottom: 0"><span class="fa fa-chevron-up"></span><span class="tit">顶部</span></a></li>
+        </ul>
+        <div class="content-box" id="content-compare">
+            <div class="top">
+                <h3>商品对比</h3>
+                <a href="javascript:void(0);" class="close fa fa-angle-double-right" title="隐藏"></a></div>
+            <div id="comparelist"></div>
+        </div>
+        <div class="content-box" id="content-cart">
+            <div class="top">
+                <h3>我的购物车</h3>
+                <a href="javascript:void(0);" class="close fa fa-angle-double-right" title="隐藏"></a></div>
+            <div id="rtoolbar_cartlist"></div>
+        </div>
+    </div>
+</div>
+        
+<script type="text/javascript">
+
+    //动画显示边条内容区域
+    $(function() {
+        $(".close").click(function(){
+            close_bar();
+        });
+        // 右侧bar用户信息
+        $('div[dstype="a-barUserInfo"]').click(function(){
+            $('div[dstype="barUserInfo"]').toggle();
+        });
+        // 右侧bar登录
+        $('div[dstype="a-barLoginBox"]').click(function(){
+            login_dialog();
+        });
+
+        {if $cart_goods_num > 0}
+            $('#rtoobar_cart_count').html({$cart_goods_num}).show();
+        {/if}
+    });
+    function toglle_bar(item){
+        //判断侧边栏是否已拉出
+        if(parseInt($('.ds-appbar').css('width')) == 36){
+            $('.ds-appbar').css('width','306px');
+        }
+        //判断选中项是否已显示
+        if(!$("#"+item).hasClass('active')){
+            $('.tools li > a').removeClass('active');
+            $("#"+item).addClass('active');
+            $('.content-box').removeClass('active');
+            
+            switch(item){
+                case 'rtoolbar_cart':
+                    $("#rtoolbar_cartlist").load("{:url('Cart/ajax_load','type=html')}");
+                    $("#content-cart").addClass('active');
+                    break;
+                case 'compare':   
+                    loadCompare(false);
+                    $("#content-compare").addClass('active');
+                    break;
+            }
+        }else{
+            //关闭
+            close_bar();
+            $(".chat-list").css("display",'none');
+        }
+        
+    }
+    function close_bar(){
+        $('.tools li > a').removeClass('active');
+        $('.content-box').removeClass('active');
+        $('.ds-appbar').css('width','36px');
+    }
+</script> 

@@ -1,0 +1,52 @@
+  <div class="visitors pngFix">
+    <h4><span class="active" ds_type="visitmodule" data-param='{"name":"visit_me"}'>{$Think.lang.sns_visit_me}{if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}</span>
+        {$Think.lang.sns_me}{if $relation==3}{else/}TA{/if}
+        {if $relation==3}
+        <span class="line">|</span><span class="normal" ds_type="visitmodule" data-param='{"name":"visit_other"}'>
+            {if $relation==3}{$Think.lang.sns_me}{else/}TA{/if}{$Think.lang.sns_visit_other}
+        </span>
+        {/if}
+    </h4>
+    <ul id="visit_me" ds_type="visitlist">
+      {notempty name="visitme_list"}
+      {foreach name="visitme_list" item="v" key="k" }
+      <li>
+          <div class="visitor-pic"><span class="thumb size60"><i></i><a href="{:url('Membersnshome/index',['mid'=>$v.snsvisitor_mid])}" target="_blank"> <img src="{:get_member_avatar_for_id($v['snsvisitor_mid'])}" data-param="{'id':{$v.snsvisitor_mid}}" dstype="mcard" onload="javascript:ResizeImage(this,60,60);"> </a></span></div>
+        <p class="visitor-name"><a href="{:url('Membersnshome/index',['mid'=>$v.snsvisitor_mid])}" target="_blank" data-param="{'id':{$v.snsvisitor_mid}}" dstype="mcard">{$v.snsvisitor_mname}</a></p>
+        <p class="visitor-time">{$v.adddate_text}</p>
+      </li>
+      {/foreach}
+      {else /}
+      {$Think.lang.sns_visitme_tip_1}<a href="{:url('Membersnsfriend/index')}">{$Think.lang.sns_visitme_tip_2}</a>{$Think.lang.sns_visitme_tip_3}
+      {/notempty}
+    </ul>
+    {if $relation==3}
+    <ul id="visit_other" ds_type="visitlist" style="display: none;">
+      {notempty name="visitother_list"}
+      {foreach name="visitother_list" item="v" key="k" }
+      <li>
+        <div class="visitor-pic"><span class="thumb size60"><i></i><a href="{:url('Membersnshome/index',['mid'=>$v.snsvisitor_ownermid])}" target="_blank"> <img src="{:get_member_avatar_for_id($v['snsvisitor_ownermid'])}" data-param="{'id':{$v.snsvisitor_ownermid}}" dstype="mcard" onload="javascript:ResizeImage(this,60,60);"> </a></span></div>
+        <p class="visitor-name"><a href="{:url('Membersnshome/index',['mid'=>$v.snsvisitor_ownermid])}" target="_blank" data-param="{'id':{$v.snsvisitor_ownermid}}" dstype="mcard">{$v.snsvisitor_ownermname}</a></p>
+        <p class="visitor-time">{$v.adddate_text}{$v.addtime_text|}</p>
+      </li>
+      {/foreach}
+      {else /}
+      {$Think.lang.sns_visitother_tip_1}<a href="{:url('Membersnsfriend/follow')}">{$Think.lang.sns_visitother_tip_2}</a>{$Think.lang.sns_visitother_tip_3}
+      {/notempty}
+    </ul>
+    {/if}
+  </div>
+<script>
+$(function(){
+	$("[ds_type='visitmodule']").bind('click',function(){
+		var data_str = $(this).attr('data-param');
+	    eval( "data_str = "+data_str);
+	    $("[ds_type='visitmodule']").removeClass('active');
+	    $("[ds_type='visitmodule']").addClass('normal');
+	    $(this).removeClass('normal');
+	    $(this).addClass('active');
+	    $("[ds_type='visitlist']").hide();
+	    $("#"+data_str.name).show();
+	});
+});
+</script>

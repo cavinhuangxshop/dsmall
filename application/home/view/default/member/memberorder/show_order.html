@@ -1,0 +1,412 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+
+
+
+
+<div class="dsm-oredr-show">
+            <div class="dsm-order-info">
+                <div class="dsm-order-details">
+                    <div class="title">{$Think.lang.member_show_order_info}</div>
+                    <div class="content">
+                        <dl>
+                            <dt>{$Think.lang.member_show_order_receiver}{$Think.lang.ds_colon}</dt>
+                            <dd><span>{$order_info['extend_order_common']['reciver_name']}，</span><span>{$order_info['extend_order_common']['reciver_info']['phone']}，</span><span>{$order_info['extend_order_common']['reciver_info']['address']}</span></dd>
+                        </dl>
+                        <dl>
+                            <dt>发&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;票：</dt>
+                            <dd>
+                                {foreach name="$order_info.extend_order_common.invoice_info" item="value" key="key" }
+                                <span title="{$key}">{$value}</span>
+                                {/foreach}
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>{$Think.lang.member_show_order_buyer_message}{$Think.lang.ds_colon}</dt>
+                            <dd>{$order_info['extend_order_common']['order_message']}</dd>
+                        </dl>
+                        <dl class="line">
+                            <dt>{$Think.lang.member_change_order_no}{$Think.lang.ds_colon}</dt>
+                            <dd>{$order_info.order_sn}<a href="javascript:void(0);">更多<i class="fa fa-angle-down"></i>
+                                    <div class="more"><span class="arrow"></span>
+                                        <ul>
+                                            {if $order_info.payment_name}
+                                            <li>{$Think.lang.member_order_pay_method}{$Think.lang.ds_colon}<span>{$order_info.payment_name}
+                                                    <?php if($order_info['payment_code'] != 'offline' && !in_array($order_info['order_state'],array(ORDER_STATE_CANCEL,ORDER_STATE_NEW))) { ?>
+                                                    (付款单号{$Think.lang.ds_colon}{$order_info.pay_sn})
+                                                    <?php } ?>
+                                                </span> </li>
+                                            {/if}
+                                            <li>{$Think.lang.member_order_time}{$Think.lang.ds_colon}<span>{$order_info.add_time|date="Y-m-d H:i:s",###}</span></li>
+                                            {if intval($order_info['payment_time'])}
+                                            <li>{$Think.lang.member_show_order_pay_time}{$Think.lang.ds_colon}<span>{$order_info.payment_time|date="Y-m-d H:i:s",###}</span></li>
+                                            {/if}
+                                            {if $order_info['extend_order_common']['shipping_time']}
+                                            <li>{$Think.lang.member_show_order_send_time}{$Think.lang.ds_colon}<span>{$order_info.extend_order_common.shipping_time|date="Y-m-d H:i:s",###}</span></li>
+                                            {/if}
+                                            {if intval($order_info['finnshed_time'])}
+                                            <li>{$Think.lang.member_show_order_finish_time}{$Think.lang.ds_colon}<span>{$order_info.finnshed_time|date="Y-m-d H:i:s",###}</span></li>
+                                            {/if}
+                                        </ul>
+                                    </div>
+                                </a></dd>
+                        </dl>
+                        <dl>
+                            <dt>{$Think.lang.member_show_order_seller_info}{$Think.lang.ds_colon}</dt>
+                            <dd>{$order_info['extend_store']['store_name']}<a href="javascript:void(0);">更多<i class="fa fa-angle-down"></i>
+                                    <div class="more"><span class="arrow"></span>
+                                        <ul>
+                                            <li>{$Think.lang.member_address_location}{$Think.lang.ds_colon}<span>{$order_info.extend_store.store_address}</span></li>
+                                            <li>联系电话：<span>{$order_info['extend_store']['store_phone']}</span></li>
+                                        </ul>
+                                    </div>
+                                </a>
+                                <div class="msg"> <span member_id="{$order_info['extend_store']['member_id']}"></span>
+                                    {if !empty($order_info.extend_store.store_qq)}
+                                    <a target="_blank" href="{$Think.HTTP_TYPE}wpa.qq.com/msgrd?v=3&uin={$order_info.extend_store.store_qq}&site=qq&menu=yes" ><img border="0" src="{$Think.HTTP_TYPE}wpa.qq.com/pa?p=2:{$order_info.extend_store.store_qq}:52" style=" vertical-align: middle;"/></a>
+                                    {/if}
+                                    <!-- wang wang -->
+                                    {if !empty($order_info.extend_store.store_ww)}
+                                    <a target="_blank" href="http://amos.im.alisoft.com/msg.aw?v=2&uid={$order_info.extend_store.store_ww}&site=cntaobao&s=2&charset=utf-8"  class="vm" ><img border="0" src="http://amos.im.alisoft.com/online.aw?v=2&uid={$order_info.extend_store.store_ww}&site=cntaobao&s=2&charset=utf-8" alt="Wang Wang"  style=" vertical-align: middle;"/></a>
+                                    {/if}
+                                </div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                {if $order_info['order_state'] == ORDER_STATE_CANCEL}
+                <div class="dsm-order-condition">
+                    <dl>
+                        <dt><i class="fa fa-power-off orange"></i>订单状态：</dt>
+                        <dd>交易关闭</dd>
+                    </dl>
+                    <ul>
+                        <li>{$order_info['close_info']['log_role']} 于 {$order_info.close_info.log_time|date="Y-m-d H:i:s",###} {$order_info.close_info.log_msg}</li>
+                    </ul>
+                </div>
+                {/if}
+                {if $order_info['order_state'] == ORDER_STATE_NEW}
+                <div class="dsm-order-condition">
+                    <dl>
+                        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                        <dd>订单已经提交，等待买家付款</dd>
+                    </dl>
+                    <ul>
+                        <li>1. 您尚未对该订单进行支付，请<a href="{:url('Buy/pay',['pay_sn'=>$order_info.pay_sn])}" class="dsm-btn-mini dsm-btn-orange"><i></i>支付订单</a>以确保商家及时发货。</li>
+                        <li>2. 如果您不想购买此订单的商品，请选择<a href="#order-step" class="dsm-btn-mini">取消订单</a>操作。</li>
+                        <li>3. 如果您未对该笔订单进行支付操作，系统将于
+                            <time>{$order_info.order_cancel_day|date="Y-m-d H:i:s",###}</time>
+                            自动关闭该订单。</li>
+                    </ul>
+                </div>
+                {/if}
+                {if $order_info['order_state'] == ORDER_STATE_PAY}
+                <div class="dsm-order-condition">
+                    <dl>
+                        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                        <dd>
+                            {if $order_info['payment_code'] == 'offline'}订单已提交，等待卖家发货{else/}已支付成功{/if}
+                        </dd>
+                    </dl>
+                    <ul>
+                        {if $order_info['payment_code'] == 'offline'}
+                        <li>1. 您已经选择货到付款方式下单成功。</li>
+                        <li>2. 订单已提交商家进行备货发货准备。</li>
+                        <li>3. 如果您不想购买此订单的商品，请选择<a href="#order-step" class="dsm-btn-mini">取消订单</a>操作。</li>
+                        {else/}
+                        <li>1. 您已使用“{:get_order_payment_name($order_info['payment_code'])}”方式成功对订单进行支付，支付单号 “{$order_info.pay_sn}”。</li>
+                        <li>2. 订单已提交商家进行备货发货准备。</li>
+                        <li>3. 如果您想取消购买，请与商家沟通后对订单进行<a class="dsm-btn-mini" href="#order-step">申请退款</a>操作。</li>
+                        {/if}
+                    </ul>
+                </div>
+                {/if}
+                {if $order_info['order_state'] == ORDER_STATE_SEND}
+                <div class="dsm-order-condition">
+                    <dl>
+                        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                        <dd>商家已发货{if $order_info['extend_order_common']['dlyo_pickup_code'] != ''}， 提货码：{$order_info['extend_order_common']['dlyo_pickup_code']}{/if}</dd>
+                    </dl>
+                    <ul>
+                        <li>1. 商品已发出；
+                            {if $order_info.shipping_code != ''}
+                            物流公司：{$order_info['express_info']['express_name']}；单号：{$order_info.shipping_code}。
+                            {if $order_info.if_deliver}
+                            查看 <a href="#order-step" class="blue">“物流跟踪”</a> 情况。
+                            {/if}
+                            {else/}
+                            无需要物流。
+                            {/if}
+                        </li>
+                        <li>2. 如果您已收到货，且对商品满意，您可以<a href="#order-step" class="dsm-btn-mini dsm-btn-green">确认收货</a>完成交易。</li>
+                        <li>3. 系统将于
+                            <time>{$order_info.order_confirm_day|date="Y-m-d H:i:s",###}</time>
+                            自动完成“确认收货”，完成交易。</li>
+                    </ul>
+                </div>
+                {/if}
+                {if $order_info['order_state'] == ORDER_STATE_SUCCESS}
+                {if $order_info['evaluation_state'] == 1}
+                <div class="dsm-order-condition">
+                    <dl>
+                        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                        <dd>评价完成。</dd>
+                    </dl>
+                    <ul>
+                        <li>1. 您已对该笔订单进行了商品及交易评价，感谢您的支持，祝您购物愉快！</li>
+                        <li>2. 将感兴趣的<a href="{:url('Memberfavorites/fglist')}" class="dsm-btn-mini">收藏商品</a>加入购物车进行购买。</li>
+                        <li>3. 看一看<a href="{:url('Store/index',['store_id'=>$order_info.store_id])}" class="dsm-btn-mini">该店铺</a>中有什么新商品上架。</li>
+                    </ul>
+                </div>
+                {else/}
+                <div class="dsm-order-condition">
+                    <dl>
+                        <dt><i class="fa fa-check-circle-o green"></i>订单状态：</dt>
+                        <dd>已经收货。</dd>
+                    </dl>
+                    <ul>
+                        <li>1. 如果收到货后出现问题，您可以联系商家协商解决。</li>
+                        <li>2. 如果商家没有履行应尽的承诺，您可以申请 <a href="#order-step" class="red">"投诉维权"</a>。</li>
+                        {if $order_info.if_evaluation}
+                        <li>3. 交易已完成，你可以对购买的商品及商家的服务进行<a href="#order-step" class="dsm-btn-mini dsm-btn-acidblue">评价</a>及晒单。</li>
+                        {/if}
+                    </ul>
+                </div>
+                {/if}
+                {/if}
+                <div class="mall-msg">有疑问可咨询<a href="javascript:void(0);" onclick="ajax_form('mall_consult', '平台客服', '{:url('Membermallconsult/add_mallconsult',['inajax'=>'1'])}', 640);"><i class="fa fa-comments-o"></i>平台客服</a></div>
+            </div>
+            {if $order_info['order_state'] != ORDER_STATE_CANCEL}
+            <div id="order-step" class="dsm-order-step">
+                <dl class="step-first {if $order_info['order_state'] != ORDER_STATE_CANCEL}current{/if}">
+                    <dt>生成订单</dt>
+                    <dd class="bg"></dd>
+                    <dd class="date" title="{$Think.lang.member_order_time}">{$order_info.add_time|date="Y-m-d H:i:s",###}</dd>
+                </dl>
+                {if $order_info['payment_code'] != 'offline'}
+                <dl class="{if intval($order_info['payment_time'])}current{/if}">
+                    <dt>完成付款</dt>
+                    <dd class="bg"> </dd>
+                    <dd class="date" title="{$Think.lang.member_show_order_pay_time}">{$order_info.payment_time|date="Y-m-d H:i:s",###}</dd>
+                </dl>
+                {/if}
+                <dl class="{if $order_info['extend_order_common']['shipping_time']}current{/if}">
+                    <dt>商家发货</dt>
+                    <dd class="bg"> </dd>
+                    <dd class="date" title="{$Think.lang.member_show_order_send_time}">{$order_info.extend_order_common.shipping_time|date="Y-m-d H:i:s",###}</dd>
+                </dl>
+                <dl class="{if intval($order_info['finnshed_time'])}current{/if}">
+                    <dt>确认收货</dt>
+                    <dd class="bg"> </dd>
+                    <dd class="date" title="{$Think.lang.member_show_order_finish_time}">{$order_info.finnshed_time|date="Y-m-d H:i:s",###}</dd>
+                </dl>
+                <dl class="{if $order_info['evaluation_state'] == 1}current{/if}">
+                    <dt>评价</dt>
+                    <dd class="bg"></dd>
+                    <dd class="date" title="评价时间">{$order_info['extend_order_common']['evaluation_time']|date="Y-m-d H:i:s",###}</dd>
+                </dl>
+            </div>
+            {/if}
+            <div class="dsm-order-contnet">
+                <table class="dsm-default-table order">
+                    <thead>
+                        <tr>
+                            <th class="w10"></th>
+                            <th colspan="2">{$Think.lang.member_order_goods_name}</th>
+                            <th class="w20"></th>
+                            <th class="w120 tl">{$Think.lang.member_order_price}（元）</th>
+                            <th class="w60">{$Think.lang.member_order_amount}</th>
+                            <th class="w100">优惠活动</th>
+                            <th class="w100">售后维权</th>
+                            <th class="w100">交易状态</th>
+                            <th class="w100">交易操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {notempty name="$order_info.shipping_code"}
+                        <tr>
+                            <th colspan="7" style="border-right: none;"> <div class="order-deliver"><span>物流公司： <a target="_blank" href="{$order_info.express_info.express_url}">{$order_info.express_info.express_name}</a></span><span> {$Think.lang.member_show_order_shipping_no}{$Think.lang.ds_colon}{$order_info.shipping_code} </span><span><a href="javascript:void(0);" id="show_shipping">物流跟踪<i class="fa fa-angle-down"></i>
+                                <div class="more"><span class="arrow"></span>
+                                    <ul id="shipping_ul">
+                                        <li>加载中...</li>
+                                    </ul>
+                                </div>
+                            </a></span></div></th>
+                    <th colspan="3" style=" border-left: none;">
+                        {notempty name="daddress_info"}
+                    <dl class="daddress-info">
+                        <dt>发&nbsp;&nbsp;货&nbsp;&nbsp;人：</dt>
+                        <dd>{$daddress_info.seller_name}<a href="javascript:void(0);">更多<i class="fa fa-angle-down"></i>
+                                <div class="more"><span class="arrow"></span>
+                                    <ul>
+                                        <li>公&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;司：<span>{$daddress_info.daddress_company}</span></li>
+                                        <li>联系电话：<span>{$daddress_info.daddress_telphone}</span></li>
+                                        <li>发货地址：<span>{$daddress_info.area_info}&nbsp;{$daddress_info.daddress_detail}</span></li>
+                                    </ul>
+                                </div>
+                            </a></dd>
+                    </dl>
+                    {/notempty}
+                    </th>
+                    </tr>
+                    {/notempty}
+                    <?php $i = 0;?>
+                    <?php foreach($order_info['goods_list'] as $k => $goods) {?>
+                    <?php $i++;?>
+                    <tr class="bd-line">
+                        <td>&nbsp;</td>
+                        <td class="w70"><div class="dsm-goods-thumb"><a target="_blank" href="{:url('Goods/index',['goods_id'=>$goods.goods_id])}"><img src="{:goods_thumb($goods,240)}"/></a></div></td>
+                        <td class="tl">
+                            <dl class="goods-name">
+                                <dt><a target="_blank" href="{$goods.goods_url}">{$goods.goods_name}</a></dt>
+                                <dd>
+                                    <?php if (isset($refund_all)) {?>
+                                    <?php if (is_array($refund_all) && !empty($refund_all)) {?>
+                                    退款单号：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$refund_all.refund_id])}">{$refund_all.refund_sn}</a>
+                                    <?php }else if($refund_all['refund_type'] == 1) {?>
+                                    退款单号：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$refund_all.refund_id])}">{$goods['extend_refund']['refund_sn']}</a></dd>
+                                <?php }else if($refund_all['refund_type'] == 2) {?>
+                                退货单号：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$refund_all.refund_id])}">{$goods['extend_refund']['refund_sn']}</a>
+                                <?php } ?>
+                                <?php } ?>
+                                </dd>
+                            </dl>
+                        </td>
+                        <td></td>
+                        <td class="tl refund">{$goods.goods_price}
+                            <p class="green">
+                                <?php if (isset($refund_all)) {?>
+                                <?php if (is_array($refund_all) && !empty($refund_all) && $refund_all['admin_time'] > 0) {?>
+                                {$goods.goods_pay_price}<span>退</span>
+                                <?php } elseif ($refund_all['admin_time'] > 0) { ?>
+                                {$refund_all.refund_amount}<span>退</span>
+                                <?php } ?>
+                                <?php } ?>
+                            </p></td>
+                        <td>{$goods.goods_num}</td>
+                        <td>{$goods.goods_type_cn}</td>
+                        <td><!-- 退款 -->
+                            {if isset($goods['refund']) && $goods['refund'] == 1 }
+                            <p><a href="{:url('Memberrefund/add_refund',['order_id'=>$order_info.order_id,'goods_id'=>$goods.rec_id])}">退款/退货</a></p>
+                            {/if}
+
+                            <!-- 投诉 -->
+                            {if $order_info['if_complain']}
+                            <p><a href="{:url('Membercomplain/complain_new',['order_id'=>$order_info.order_id,'goods_id'=>$goods.rec_id])}">交易投诉</a></p>
+                            {/if}
+                        </td>
+
+                        <!-- S 合并TD -->
+                        <?php if (($order_info['goods_count'] > 1 && $k ==0) || ($order_info['goods_count'] == 1)){ ?>
+                        <td class="bdl bdr" rowspan="{$order_info.goods_count}">{$order_info.state_desc}</td>
+                        <td rowspan="{$order_info.goods_count}">{if $order_info['if_lock']}<p>退款退货中</p>{/if}
+                            <!-- 取消订单 -->
+                            {if $order_info.if_cancel}
+                            <p><a href="javascript:void(0)" style="color:#F30; text-decoration:underline;" ds_type="dialog" dialog_width="480" dialog_title="{$Think.lang.member_order_cancel_order}" dialog_id="buyer_order_cancel_order" uri="{:url('Memberorder/change_state',['state_type'=>'order_cancel','order_id'=>$order_info.order_id])}"  id="order_action_cancel">{$Think.lang.member_order_cancel_order}</a></p>
+                            {/if}
+
+                            <!-- 退款取消订单 -->
+                            {if $order_info.if_refund_cancel}
+                            <p><a href="{:url('Memberrefund/add_refund_all',['order_id'=>$order_info.order_id])}" class="dsm-btn">订单退款</a></p>
+                            {/if}
+
+                            <!-- 收货 -->
+                            {if $order_info.if_receive}
+                            <p><a href="javascript:void(0)" class="dsm-btn" ds_type="dialog" dialog_id="buyer_order_confirm_order" dialog_width="480" dialog_title="{$Think.lang.member_order_ensure_order}" uri="{:url('Memberorder/change_state',['state_type'=>'order_receive','order_sn'=>$order_info.order_sn,'order_id'=>$order_info.order_id])}" id="order_action_confirm">{$Think.lang.member_order_ensure_order}</a></p>
+                            {/if}
+
+                            <!-- 评价 -->
+                            {if $order_info.if_evaluation}
+                            <p><a class="dsm-btn dsm-btn-acidblue" href="{:url('Memberevaluate/add',['order_id'=>$order_info.order_id])}">{$Think.lang.member_order_want_evaluate}</a></p>
+                            {/if}
+
+                            <!-- 已经评价 -->
+                            {if $order_info.evaluation_state == 1}{$Think.lang.order_state_eval}{/if}
+                            <!-- 分享  -->
+                            {if $order_info.if_share}
+                            <p><a href="javascript:void(0)" ds_type="sharegoods" data-param='{"gid":"{$order_info.extend_order_goods.0.goods_id}"}'>分享商品</a></p>
+                            {/if}
+                        </td>
+                        <?php } ?>
+                        <!-- E 合并TD --> 
+                    </tr>
+
+                    <!-- S 赠品列表 -->
+                    {if !empty($order_info['zengpin_list']) && $i == count($order_info['goods_list'])}
+                    <tr class="bd-line">
+                        <td>&nbsp;</td>
+                        <td colspan="7" class="tl"><div class="dsm-goods-gift">赠品：
+                                <ul>
+                                    {foreach name="$order_info.zengpin_list" item="zengpin_info"  }
+                                    <li><a target="_blank" title="赠品：{$zengpin_info.goods_name} * {$zengpin_info.goods_num}" href="{$zengpin_info.goods_url}"><img src="{:goods_thumb($zengpin_info,240)}" /></a></li>
+                                    {/foreach}
+                                </ul>
+                            </div></td>
+                    </tr>
+                    {/if}
+                    <!-- E 赠品列表 -->
+
+                    <?php } ?>
+                    </tbody>
+                    <tfoot>
+                        <?php if(!empty($order_info['extend_order_common']['promotion_info']) || !empty($order_info['extend_order_common']['voucher_code'])){ ?>
+                        <tr>
+                            <th colspan="20">
+                    <dl class="dsm-store-sales">
+                        {if !empty($order_info['extend_order_common']['promotion_info'])}
+                        <dd>{$order_info['extend_order_common']['promotion_info']}</dd>
+                        {/if}
+                        {if !empty($order_info['extend_order_common']['voucher_code'])}
+                        <dd>使用了面额为 <strong>{$order_info['extend_order_common']['voucher_price']}</strong> 元的代金券，编码：{$order_info['extend_order_common']['voucher_code']}</span></dd>
+                        {/if}
+                    </dl>
+                </th>
+                    </tr>
+                    <?php } ?>
+                    <tr>
+                        <td colspan="20"><dl class="freight">
+                                <dd>
+                                    {if !empty($order_info['shipping_fee']) && $order_info['shipping_fee'] != '0.00'}
+                                    {$Think.lang.member_show_order_tp_fee}{$Think.lang.ds_colon}<span>{$Think.lang.currency}{$order_info.shipping_fee}</span>
+                                    {else/}
+                                    {$Think.lang.ds_common_shipping_free}
+                                    {/if}
+                                </dd>
+                            </dl>
+                            
+                            <dl class="sum">
+                                <dt>{$Think.lang.member_order_sum}{$Think.lang.ds_colon}</dt>
+                                <dd><em>{$order_info.order_amount}</em>元</dd>
+                            </dl></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+
+<script type="text/javascript" src="{$Think.HOME_SITE_ROOT}/js/sns.js" charset="utf-8"></script>
+<script type="text/javascript">
+{if isset($order_info.express_info)}       
+$(function(){
+    $('#show_shipping').on('hover',function(){
+        var_send = '{$order_info.extend_order_common.shipping_time|date="Y-m-d H:i:s",###}&nbsp;&nbsp;{$Think.lang.member_show_seller_has_send}<br/>';
+    	$.getJSON(HOMESITEURL+'/Memberorder/get_express.html?express_code={$order_info.express_info.express_code}&shipping_code={$order_info.shipping_code}&t={:random(7)}',function(data){
+    		if(data){
+    			data = var_send+data.join('<br/>');
+    			$('#shipping_ul').html('<li>'+data+'</li>');
+    			$('#show_shipping').unbind('hover');
+    		}else{
+    			$('#shipping_ul').html(var_send);
+    			$('#show_shipping').unbind('hover');
+    		}
+    	});
+    });
+});
+{/if}
+</script>
+
+
+
+
+{/block}

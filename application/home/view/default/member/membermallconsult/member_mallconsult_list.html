@@ -1,0 +1,55 @@
+{extend name="default/base/base_member" /}
+{block name="member_btn"}<a class="dsm-btn dsm-btn-orange" href="{:url('Membermallconsult/add_mallconsult')}"><i class="fa fa-comments-o"></i>平台客服</a>{/block}
+{block name="member_main"}
+
+
+
+
+<table class="dsm-default-table">
+            <thead>
+                <tr>
+                    <th class="w10"></th>
+                    <th class="tl">咨询内容</th>
+                    <th class="w150">咨询时间</th>
+                    <th class="w150">状态</th>
+                    <th class="w110">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {notempty name="consult_list"}
+                {foreach name="consult_list" item="val"}
+                <tr class="bd-line">
+                    <td></td>
+                    <td class="tl">{$val.mallconsult_content}</td>
+                    <td>{:date('Y-m-d H:i:s',$val.mallconsult_addtime)}</td>
+                    <td class="">{$state[$val.mallconsult_isreply]}</td>
+                    <td class="dsm-table-handle">
+                        <span><a href="{:url('Membermallconsult/mallconsult_info',['id'=>$val.mallconsult_id])}" class="btn-blue"><i class="fa fa-eye"></i><p>查看</p></a></span>
+                        <span><a href="javascript:void(0);" onclick="ajax_get_confirm('{$Think.lang.ds_common_op_confirm}', '{:url('Membermallconsult/del_mallconsult',['id'=>$val.mallconsult_id])}');" class="btn-blue"><i class="fa fa-trash-o"></i><p>删除</p></a></span>
+                    </td>
+                </tr>
+                {/foreach}
+                {else /}
+                <tr>
+                    <td colspan="20" class="norecord"><div class="warning-option"><i>&nbsp;</i><span>{$Think.lang.no_record}</span></div></td>
+                </tr>
+                {/notempty}
+            </tbody>
+            <tfoot>
+                {notempty name="consult_list"}
+                <tr>
+                    <td colspan="20"><div class="pagination"> {$show_page}</div></td>
+                </tr>
+                {/notempty}
+            </tfoot>
+        </table>
+
+
+
+
+
+
+
+{/block}
+
+

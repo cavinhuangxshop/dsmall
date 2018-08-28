@@ -1,0 +1,144 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<div class="alert alert-block mt10">
+    <ul>
+        <li>1. 店铺到期前 30 天可以申请店铺续签。</li>
+        {notempty name="reopen_list"}
+        <li>2. 您的店铺已签约至 {$store_info.store_endtime|date="Y-m-d",###}，自 {$store_info.allow_applay_date|date="Y-m-d",###} 起的 30 天内可以申请续签。</li>
+        {/notempty}
+    </ul>
+</div>
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w10"></th>
+            <th>收费标准(元/年)</th>
+            <th>续签时长(年)</th>
+            <th>付款金额(元)</th>
+            <th>付款凭证</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="reopen_list"}
+        {foreach name="reopen_list" item="val" }
+        <tr class="bd-line">
+            <td></td>
+            <td>{$val.storereopen_grade_price} ( {$val.storereopen_grade_name} )</td>
+            <td>{$val.storereopen_year}</td>
+            <td>{if $val.storereopen_pay_amount == 0}免费{else/}{$val.storereopen_pay_amount}{/if}</td>
+            <td>
+                {if $val.storereopen_pay_cert != ''}
+                <a data-lightbox="lightbox-image" href="{:get_store_joinin_imageurl($val['storereopen_pay_cert'])}">查看</a>
+                {/if}
+            </td>
+            <td><?php echo str_replace(array('0','1','2'),array('待付款','待审核','通过审核'),$val['storereopen_state']);?></td>
+            <td class="nscs-table-handle">
+                {if $val.storereopen_state == '0'}
+                <span><a href="javascript:void(0)" class="btn-red" onclick="ajax_get_confirm('{$Think.lang.ds_ensure_del}', '{:url('Sellerinfo/reopen_del',['storereopen_id'=>$val.storereopen_id])}');"><i class="fa fa-trash-o"></i><p>{$Think.lang.ds_del}</p></a></span>
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr>
+            <td colspan="20" class="norecord"><div class="warning-option"><i class="fa fa-warning"></i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+</table>
+<div class="dssc-form-default">
+    {if isset($upload_cert)}
+    <form method="post" action="{:url('Sellerinfo/reopen_upload')}" name="upload_form" id="upload_form" enctype="multipart/form-data">
+        <input type="hidden" name="storereopen_id" value="{$reopen_info.storereopen_id}">
+        <dl>
+            <dt>缴费金额{$Think.lang.ds_colon}</dt>
+            <dd>
+                {$reopen_info.storereopen_pay_amount} 元
+            </dd>
+        </dl>
+        <dl>
+            <dt>上传付款凭证{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input name="storereopen_pay_cert" type="file">
+            </dd>
+        </dl>
+        <dl>
+            <dt>备注{$Think.lang.ds_colon}</dt>
+            <dd>
+                <textarea name="storereopen_pay_cert_explain" rows="10" cols="30"></textarea>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <label class="submit-border"><input type="button" id="btn_upload_reopen"  class="submit" value="{$Think.lang.ds_submit}" /></label>
+        </div>
+    </form>
+    {/if}
+    {if isset($applay_reopen)}
+    <form method="post" action="{:url('Sellerinfo/reopen_add')}" name="add_form" id="add_form">
+        <dl>
+            <dt>申请店铺等级{$Think.lang.ds_colon}</dt>
+            <dd>
+                <select name="storereopen_grade_id" style="width: auto;">
+                    {notempty name="grade_list"}
+                    {foreach name="grade_list" item="val"  }
+                    <option {if $val.storegrade_id==$current_grade_id}selected{/if} value="{$val.storegrade_id}">{$val.storegrade_name} {if floatval($val['storegrade_price'])>0}{$val.storegrade_price}元/年{else/}免费{/if}</option>
+                    {/foreach}
+                    {/notempty}
+                </select>
+            </dd>
+        </dl>
+        <dl>
+            <dt>申请续签时长{$Think.lang.ds_colon}</dt>
+            <dd>
+                <select name="storereopen_year">
+                    <option value="1">1 年</option>
+                    <option value="2">2 年</option>
+                </select>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <label class="submit-border"><input type="button" id="btn_add_reopen"  class="submit" value="{$Think.lang.ds_submit}" /></label>
+        </div>
+    </form>
+    {/if}
+</div>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/css/lightbox.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/js/lightbox.min.js"></script>
+<script type="text/javascript">
+                    $(document).ready(function() {
+                        //页面输入内容验证
+                        $('#btn_add_reopen').on('click', function() {
+                            ajaxpost('add_form', '', '', 'onerror')
+                        });
+                        $('#upload_form').validate({
+                            submitHandler: function(form) {
+                                ajaxpost('upload_form', '', '', 'onerror');
+                            },
+                            rules: {
+                                storereopen_pay_cert: {
+                                    required: true
+                                },
+                                storereopen_pay_cert_explain: {
+                                    maxlength: 100
+                                }
+                            },
+                            messages: {
+                                storereopen_pay_cert: {
+                                    required: '请选择付款凭证'
+                                },
+                                storereopen_pay_cert_explain: {
+                                    maxlength: jQuery.validator.format("最多{0}个字")
+                                }
+                            }
+                        });
+                        $('#btn_upload_reopen').on('click', function() {
+                            $('#upload_form').submit();
+                        });
+                    });
+</script>
+
+{/block}
+
+

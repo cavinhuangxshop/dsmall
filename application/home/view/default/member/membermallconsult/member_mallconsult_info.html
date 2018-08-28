@@ -1,0 +1,83 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+
+
+
+
+<div class="dsm-flow-layout">
+            <div id="dsmInformFlow" class="dsm-flow-container">
+                <div class="title">
+                    <h3>咨询平台客服</h3>
+                </div>
+                <div class="dsm-flow-step">
+                    <dl class="step-first current">
+                        <dt>填写咨询内容</dt>
+                        <dd class="bg"></dd>
+                    </dl>
+                    <dl class="{if $consult_info.mallconsult_isreply == 1}current{/if}">
+                        <dt>平台客服回复</dt>
+                        <dd class="bg"> </dd>
+                    </dl>
+                    <dl class="{if $consult_info.mallconsult_isreply == 1}current{/if}">
+                        <dt>咨询完成</dt>
+                        <dd class="bg"> </dd>
+                    </dl>
+                </div>
+                <div class="dsm-default-form">
+                    <dl>
+                        <dt>咨询类型{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            {$type_list[$consult_info.mallconsulttype_id]['mallconsulttype_name']}
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>咨询内容{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            {$consult_info.mallconsult_content}
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>咨询时间{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            {:date('Y-m-d H:i:s',$consult_info.mallconsult_addtime)}
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>回复状态{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            {$state[$consult_info.mallconsult_isreply]}
+                        </dd>
+                    </dl>
+                    {if $consult_info.mallconsult_isreply == 1}
+                    <dl>
+                        <dt>回复内容{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            {$consult_info.mallconsult_reply_content}
+                        </dd>
+                    </dl>
+                    {/if}
+                    <div class="bottom"><a href="javascript:history.go(-1);" class="dsm-btn ml10">返回列表</a></div>
+                </div>
+            </div>
+            <div class="dsm-flow-item">
+                <div class="title">温馨提示</div>
+                <div class="content">
+                    <div class="alert">
+                        <ul>
+                            <li> 1.如果您对商品规格、介绍等有疑问，可以在商品详情页“购买咨询”处发起咨询，会得到及时专业的回复；</li>
+                            <li> 2.如需处理交易中产生的纠纷，请选择投诉；</li>
+                            <li> 3.举报时依次选择咨询类型，填写违规描述（必填，不超过200字）。请尽量详细填写您要咨询的内容，以方便我们用最短的时间解决您的疑问。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+{/block}
+

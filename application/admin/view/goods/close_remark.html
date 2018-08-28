@@ -1,0 +1,23 @@
+{include file="public/header" /}
+<form method="post" name="form1" id="form1" action="{:url('Goods/goods_lockup')}">
+    <input type="hidden" value="{$commonids}" name="commonids">
+    <table class="ds-default-table nobdb">
+        <tbody>
+            <tr class="noborder" style="text-align: center">
+                <td class="vatop rowform"><textarea rows="6" class="tarea" cols="60" name="close_reason" id="close_reason"></textarea></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="tfoot">
+                <td colspan="2"><input type="submit" value="{$Think.lang.ds_submit}"  class="btn" /></td>
+            </tr>
+        </tfoot>
+    </table>
+</form>
+<script>
+    $(function() {
+        $('a[dstype="btn_submit"]').click(function() {
+            ajaxpost('form1', '', '', 'onerror');
+        });
+    });
+</script>

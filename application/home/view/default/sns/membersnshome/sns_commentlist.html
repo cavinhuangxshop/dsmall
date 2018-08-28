@@ -1,0 +1,122 @@
+<div class="comment-widget">
+  <div class="comment-edit">
+    <form id="commentform_{$tid}" method="post" action="{:url('Membersnsindex/addcomment')}">
+      <input type="hidden" name="originaltype" value="{$type}"/>
+      <input type="hidden" name="originalid" value="{$tid}"/>
+      <input type="hidden" name="showtype" value="{$showtype}"/>
+      <div class="comment-add">
+        <textarea placeholder="{$Think.lang.sns_comment_contenttip}" resize="none" id="content_comment{$tid}" name="commentcontent"></textarea>
+        <span class="error"></span> 
+        <!-- 验证码 -->
+        <div id="commentseccode{$tid}" class="seccode" style="display: none;">
+          <label for="captcha">{$Think.lang.ds_checkcode}{$Think.lang.ds_colon}</label>
+          <input name="captcha" class="text" type="text" size="4" maxlength="4"/>
+          <img src="" title="{$Think.lang.wrong_checkcode_change}" name="codeimage" onclick="this.src='{:captcha_src()}'"/> <span>{$Think.lang.wrong_seccode}</span>
+        </div>
+        <input type="text" style="display:none;" />
+        <!-- 防止点击Enter键提交 -->
+        <div class="act"> <span class="skin-blue"><span class="btn"><a href="javascript:void(0);" ds_type="commentbtn" data-param='{"txtid":"{$tid}"}'>{$Think.lang.sns_comment}</a></span></span> <span id="commentcharcount{$tid}" style="float:right;"></span> <a class="face" ds_type="smiliesbtn" data-param='{"txtid":"comment{$tid}"}' href="javascript:void(0);" >{$Think.lang.sns_smiles}</a> </div>
+      </div>
+    </form>
+  </div>
+  <div class="clear"></div>
+  {if count($commentlist)>0}
+  <ul class="comment-list">
+    {foreach name="commentlist" item="v" key="k" }
+    <li ds_type="commentrow_{$v.snscomment_id}">
+        <a target="_blank" href="{:url('Membersnshome/index',['mid'=>$v.snscomment_memberid])}">
+            <img width="30" height="30" class="clogo" src="{if $v.snscomment_memberavatar !=''}{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_AVATAR}/{$v.snscomment_memberavatar}{else/}{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_COMMON}/{$Think.config.default_user_portrait}{/if}" onload="javascript:ResizeImage(this,30,30);">
+        </a>
+      <div class="detail">
+        <p class="words"><a target="_blank" href="{:url('Membersnshome/index',['mid'=>$v.snscomment_memberid])}" class="name">{$v.snscomment_membername}</a>{$Think.lang.ds_colon}{:parsesmiles($v['snscomment_content'])}</p>
+        <p class="other">
+          {if session('member_id') == $v.snscomment_memberid}
+          <span class="opt"><a href="javascript:void(0);" ds_type="snscomment_del" data-param='{"cid":"{$v.snscomment_id}"}'>{$Think.lang.ds_delete}</a></span>
+          {/if}
+          <span class="time">{$v.snscomment_addtime|date='Y-m-d H:i',###} - <?php echo $countnum-$k;?>&nbsp;{$Think.lang.sns_comment_floor}</span> </p>
+      </div>
+    </li>
+    {/foreach}
+  </ul>
+  {if $showtype=='1' && $showmore=='1'}
+  <!--展示更多连接-->
+  <div class="more"><a target="_blank" href="{:url('Membersnshome/traceinfo',['mid'=>$master_info.member_id,'id'=>$tid])}">{$Think.lang.sns_comment_more}</a></div>
+  {elseif !$showtype /}
+  <!--展示分页-->
+  <div class="pagination">{$show_page}</div>
+  {/if}
+  {/if}
+  <div style="clear:both;"></div>
+</div>
+<script type="text/javascript">
+$(function(){
+	//删除评论
+	$("[ds_type='snscomment_del']").on('click',function(){
+		var obj = $(this);
+		showDialog('{$Think.lang.ds_common_op_confirm}','confirm', '', function(){
+			var data_str = $(obj).attr('data-param');
+	        eval("data_str = "+data_str);
+	        ajax_get_confirm('','{$Think.HOME_SITE_URL}/Membersnsindex/delcomment.html?id='+data_str.cid);
+			return false;
+		});
+	});
+	//评论提交
+	$("[ds_type='commentbtn']").off().on('click',function(){
+		var data = $(this).attr('data-param');
+                eval("data = "+data);
+		if($("#commentform_"+data.txtid).valid()){
+			var cookienum = $.cookie('commentnum');
+			cookienum = parseInt(cookienum);
+			if(cookienum >= {$max_recordnum} && $("#commentseccode"+data.txtid).css('display')=="none"){
+				//显示验证码
+				$("#commentseccode"+data.txtid).show();
+				$("#commentseccode"+data.txtid).find("[name='codeimage']").attr('src','{:captcha_src()}');
+			}else if(cookienum >= {$max_recordnum} && $("#commentseccode"+data.txtid).find("[name='captcha']").val() == ''){
+				showDialog('{$Think.lang.wrong_null}');
+			}else{
+				ajaxpost('commentform_'+data.txtid, '', '', 'onerror');
+				//隐藏验证码
+				$("#commentseccode"+data.txtid).hide();
+				$("#commentseccode"+data.txtid).find("[name='codeimage']").attr('src','');
+				$("#commentseccode"+data.txtid).find("[name='captcha']").val('');
+			}
+		}
+		return false;
+	});
+	$('#commentform_{$tid}').validate({
+		errorPlacement: function(error, element){
+			element.next('.error').append(error);
+	    },      
+	    rules : {
+	    	commentcontent : {
+	            required : true,
+	            maxlength : 140
+	        }
+	    },
+	    messages : {
+	    	commentcontent : {
+	            required : '{$Think.lang.sns_comment_null}',
+	            maxlength: '{$Think.lang.sns_content_beyond}'
+	        }
+	    }
+	});
+        {if !$showtype == 1}
+	//分页绑定异步加载事件
+	$('#tracereply_{$tid}').find('.demo').ajaxContent({
+		event:'click',
+		loaderType:"img",
+		loadingMsg:"{$Think.HOME_SITE_ROOT}/images/transparent.gif",
+		target:'#tracereply_{$tid}'
+	});
+        {/if}
+	//评论字符个数动态计算
+	$("#content_comment{$tid}").charCount({
+		allowed: 140,
+		warning: 10,
+		counterContainerID:'commentcharcount{$tid}',
+		firstCounterText:'{$Think.lang.sns_charcount_tip1}',
+		endCounterText:'{$Think.lang.sns_charcount_tip2}',
+		errorCounterText:'{$Think.lang.sns_charcount_tip3}'
+	});
+});
+</script>

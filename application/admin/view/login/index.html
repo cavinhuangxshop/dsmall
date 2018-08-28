@@ -1,0 +1,38 @@
+{include file="public/header" /} 
+<style>
+    body{background-image:url({$Think.ADMIN_SITE_ROOT}/images/wallpage/bg_{:rand(1,8)}.jpg););background-size: cover;}
+</style>
+<div class="login">
+    <div class="login_body">
+        <div class="login_header">
+            <img src="{$Think.ADMIN_SITE_ROOT}/images/logo.png"/>
+        </div>
+        <div class="login_content">
+            <form method="post">
+                <div class="form-group">
+                    <input type="text" name="admin_name" placeholder="用户名" required class="text">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="admin_password" placeholder="密码" required  class="text">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="captcha" placeholder="验证码" required  class="text" style="width:60%;float:left;">
+                    <img src="{:captcha_src()}" style="width:30%;height:38px;" id="change_captcha"/>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn" value="登录" style="width:100%"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $('#change_captcha').click(function () {
+        $(this).attr('src', '{:captcha_src()}?'+(new Date().getTime()));
+    });
+</script>
+{include file="public/footer" /} 
+
+
+
+

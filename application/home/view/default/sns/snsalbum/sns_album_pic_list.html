@@ -1,0 +1,141 @@
+{extend name="default/base/base_sns" /}
+{block name="sns_main"}
+
+
+<div class="sns-main-all">
+  <div class="tabmenu">
+      {include file='default/base/seller_items'/}
+  </div>
+  <div id="pictureFolder" class="album">
+    <div class="intro">
+      <div class="covers"><span class="thumb size60"><i></i>
+        <img id="aclass_cover" src="{:get_snsalbumpic($master_id,$class_info['ap_cover'])}"  onload="javascript:ResizeImage(this,60,60);">
+        </span></div>
+      <dl>
+        <dt>{$class_info.ac_name}</dt>
+        <dd>{$class_info.ac_des}</dd>
+      </dl>
+        {if $relation=='3'}
+          <div class="button"><a id="open_uploader" href="JavaScript:void(0);" class="dssc-btn dssc-btn-acidblue "><i class="fa fa-cloud-upload"></i>{$Think.lang.sns_upload_more_pic}</a></div>
+          <div class="upload-con" id="uploader" style="display: none;">
+            <form method="post" action="" id="fileupload" enctype="multipart/form-data">
+              <input type="hidden" name="category_id" value="{$class_info.ac_id}">
+              <div class="upload-con-div">
+                <div class="dssc-upload-btn"> <a href="javascript:void(0);"><span>
+                  <input type="file" hidefocus="true" size="1" class="input-file" name="file" multiple="multiple"/>
+                  </span>
+                  <p><i class="fa fa-upload"></i>选择图片上传</p>
+                  </a> </div>
+              </div>
+              <div dstype="file_msg"></div>
+              <div class="upload-pmgressbar" dstype="file_loading"></div>
+              <div class="upload-txt"><span>{$Think.lang.album_batch_upload_description}{$Think.config.image_max_filesize}KB{$Think.lang.album_batch_upload_description_1}</span> </div>
+            </form>
+          </div>
+          {/if}
+    </div>
+  </div>
+    {notempty name="pic_list"}
+    <ul class="ds-sns-pinterest masoned mt20"  id="snsPinterest">
+      	<?php $ii=0;?>
+        <?php foreach($pic_list as $v){?>
+        <?php
+        	$curpage = isset($_GET['curpage']) ? intval($_GET['curpage']) : 1;
+        	$ii++;
+        ?>
+      <li class="item">
+        <?php if(is_array($pic_list) && !empty($pic_list) && $relation == 3){?>
+        <ul class="handle">
+          <li class="cover"><a href="JavaScript:void(0);" onclick="cover({$v.ap_id})"><i></i>{$Think.lang.album_plist_set_to_cover}</a></li>
+          <li class="delete"><a href="javascript:void(0)" onclick="ajax_get_confirm('{$Think.lang.album_plist_delete_confirm_message}','{$Think.HOME_SITE_URL}Snsalbum/album_pic_del.html?id={$v.ap_id}');"><i></i>{$Think.lang.ds_delete}</a></li>
+        </ul>
+        <?php }?>
+        <dl>
+          <dt class="goodspic">
+          <span class="thumb size233"><i></i>
+              <a data-lightbox="lightbox-image" data-title="上传于:{$v.ap_uploadtime|date='Y-m-d',###}" href="{:get_snsalbumpic($master_id,$v['ap_cover'])}">
+                  <img id="img_{$v.ap_id}" src="{:get_snsalbumpic($master_id,$v['ap_cover'])}"></a>
+          </span> 
+          </dt>
+          <dd> <span class="pinterest-addtime">{$Think.lang.album_plist_upload_time}{$Think.lang.ds_colon}{$v.ap_uploadtime|date='Y-m-d',###}</span>
+          </dd>
+        </dl>
+      </li>
+      <?php }?>
+    </ul>
+  <div class="clear" style="padding-top:20px;"></div>
+  <div class="pagination">{$show_page}</div>
+  <div class="clear"></div>
+  {else/}
+  {if $relation=='3'}
+  <div class="sns-norecord"><i class="pictures pngFix">&nbsp;</i><span>{$Think.lang.sns_no_pic_tips1}</span></div>
+  {else/}
+  <div class="sns-norecord"><i class="pictures pngFix">&nbsp;</i><span>{$Think.lang.sns_no_pic_tips2}</span></div>
+  {/if}
+  {/notempty}
+  <script type="text/javascript">
+function cover(id){
+	if($('#aclass_cover').attr('src') != $('#img_'+id).attr('src')){
+		ajaxget('{$Think.HOME_SITE_URL}/Snsalbum/change_album_cover.html?id='+id);
+	}else{
+		showError('{$Think.lang.album_plist_not_set_same_image}');
+	}
+}
+</script>
+</div>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/css/lightbox.min.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery.lightbox/js/lightbox.min.js"></script>
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.masonry.js" type="text/javascript"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/fileupload/jquery.iframe-transport.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/fileupload/jquery.ui.widget.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/fileupload/jquery.fileupload.js" charset="utf-8"></script>
+<script type="text/javascript">
+$(function(){
+	$("#snsPinterest").imagesLoaded( function(){
+		$("#snsPinterest").masonry({
+			itemSelector : '.item'
+		});
+	});
+});
+</script>
+{if $relation=='3'}
+<script type="text/javascript">
+$(function(){
+    // ajax 上传图片
+    var upload_num = 0; // 上传图片成功数量
+    $('#fileupload').fileupload({
+        dataType: 'json',
+        url: "{:url('Snsalbum/swfupload')}",
+        add: function (e,data) {
+            $.each(data.files, function (index, file) {
+                $('<div dstype=' + file.name.replace(/\./g, '_') + '><p>'+ file.name +'</p><p class="loading"></p></div>').appendTo('div[dstype="file_loading"]');
+            });
+            data.submit();
+        },
+        done: function (e,data) {
+            var param = data.result;
+            $this = $('div[dstype="' + param.origin_file_name.replace(/\./g, '_') + '"]');
+            $this.fadeOut(3000, function(){
+                $(this).remove();
+                if ($('div[dstype="file_loading"]').html() == '') {
+                    setTimeout("window.location.reload()", 1000);
+                }
+            });
+            if(param.state == 'true'){
+                upload_num++;
+                $('div[dstype="file_msg"]').html('<i class="fa fa-sign-in">'+'</i>'+'{$Think.lang.album_upload_complete_one}'+upload_num+'{$Think.lang.album_upload_complete_two}');
+            } else {
+                $this.find('.loading').html(param.message).removeClass('loading');
+            }
+        }
+    });
+});
+</script>
+{/if}
+
+
+
+
+
+
+{/block}

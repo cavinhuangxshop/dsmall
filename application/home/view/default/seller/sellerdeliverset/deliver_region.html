@@ -1,0 +1,28 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+  <div class="dssc-form-default">
+            <form method="post"  action="" id="my_store_form">
+                <dl>
+                    <dt>默认配送地区{$Think.lang.ds_colon}</dt>
+                    <dd>
+                        <input name="region" type="hidden"  id="region" value="{$deliver_region[1]}" />
+                        <input name="area_ids" type="hidden" id="_areas" value="{$deliver_region[0]}">
+                        <p class="hint">此处设置的地区将作为商品详情页面默认的配送地区显示</p>
+                    </dd>
+                </dl>
+                <div class="bottom">
+                    <label class="submit-border"><input type="submit" class="submit" value="{$Think.lang.ds_common_button_save}" /></label>
+                </div>
+            </form>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                $('#region').ds_region();
+            });
+            $("form").submit(function () {
+                ajaxpost('my_store_form', "{:url('Sellerdeliverset/deliver_region')}", '', 'onerror');
+            })
+        </script>
+
+
+{/block}

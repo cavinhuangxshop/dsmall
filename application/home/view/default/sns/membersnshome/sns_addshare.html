@@ -1,0 +1,106 @@
+<div class="addshare">
+<div class="goods-pic"><span class="thumb size120"><i></i><img src="{:goods_cthumb($sharegoods_info['snsgoods_goodsimage'], 240,$sharegoods_info['snsgoods_storeid'])}"/></span></div>
+  <ul id="goods_images">
+    <?php for($i=0;$i<5;$i++){?>
+    <li ds_type="handle_pic" data-param="{'apid':'<?php echo isset($pic_list[$i])?$pic_list[$i]['ap_id']:0;?>'}" >
+      <div class="picture"><span class="thumb size60"><i></i> <img src="{if isset($pic_list[$i])}{:sns_thumb($pic_list[$i]['ap_name'])}{else/}{$Think.UPLOAD_SITE_URL}/{:default_goodsimage(60)}{/if}" onload="javascript:ResizeImage(this,60,60);"/> </span></div>
+      <div class="bg" ds_type="handler" style="display:none;"><span class="delete" title="{$Think.lang.ds_delete}" dstype="drop_image">{$Think.lang.ds_delete}</span></div>
+      <div class="upload-btn"><a href="javascript:void(0);"><span style="width: 66px; height: 28px; position: absolute; left: 0; top: 0; z-index: 999; cursor:pointer; ">
+        <input type="file" id="file{$i}" name="file{$i}" style="width: 66px; height: 28px; cursor: pointer; opacity:0; filter: alpha(opacity=0)" size="1" hidefocus="true">
+        </span>
+        <div class="upload-button">{$Think.lang.sns_upload}</div>
+        <input id="submit_button" style="display:none" type="button" value="{$Think.lang.ds_submit}" onClick="submit_form($(this))">
+        </a></div>
+    </li>
+    <?php }?>
+  </ul>
+  <div class="sns-skin-button"> <a class="save" onclick="DialogManager.close('add_share');location.reload();" href="javascript:void(0);">{$Think.lang.sns_complete}</a> </div>
+</div>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/ajaxfileupload.js" charset="utf-8"></script> 
+<script type="text/javascript">
+$(function(){
+	img_handle();
+	$('#goods_images').find('input[type="file"]').change(function(){
+		ajaxFileUpload($(this).attr('id'));
+	});
+
+	$('span[dstype="drop_image"]').click(function(){
+		var p_li = $(this).parents('li:first');
+		var data_str; eval( "data_str = "+p_li.attr('data-param'));
+		$.getJSON('{$Think.HOME_SITE_URL}/Membersnshome/del_sharepic.html', {apid:data_str.apid}, function(data){
+			if(data.type == 'false'){
+				alert('{$Think.lang.wrong_argument}');
+			}else{
+				p_li.attr("data-param","{'apid':'0'}");
+				p_li.find('img:first').attr('src','{$Think.UPLOAD_SITE_URL}/{:default_goodsimage(60)}');
+				p_li.find('*[ds_type="handler"]').hide().css('z-index', '0');
+				img_handle();
+			}
+		});
+	});
+});
+
+function img_handle(){
+    $('*[ds_type="handle_pic"]').each(function(){
+    	$(this).unbind();
+    	if($(this).find('img:first').attr('src') != '{$Think.UPLOAD_SITE_URL}/{:default_goodsimage(60)}'){
+    		$(this).hover(function(){
+    			var obj = $(this).find('img:first');
+    			handler = $(this).find('*[ds_type="handler"]');
+    			handler.show();
+    			handler.hover(function(){
+    				set_zindex($(this), "999");
+    			},
+    			function(){
+    				set_zindex($(this), "0");
+    			});
+    			set_zindex($(this), '999');
+    		},
+    		function(){
+    			handler.hide();
+    			set_zindex($(this), '0');
+    		});
+    	}
+    });
+}
+
+// 上传图片js
+function ajaxFileUpload(id){
+	var img_path = '{$Think.UPLOAD_SITE_URL}/{$Think.ATTACH_MALBUM}/{$Think.session.member_id}/';
+	var loading_img = HOMESITEROOT+'/images/loading.gif';
+	var data_str; eval( "data_str = "+$('#'+id).parents('li:first').attr('data-param'));
+	var img = $('#'+id).parents('li:first').find('img');
+	var default_img = img.attr('src');
+	// loading
+	img.attr('src', loading_img);
+	$.ajaxFileUpload
+	({
+		url:'{$Think.HOME_SITE_URL}/Membersnshome/image_upload.html',
+		secureuri:false,
+		fileElementId:id,
+		dataType: 'json',
+		data:{sid:'{$sid}', id:id, apid:data_str.apid},
+		success: function (data, status)
+		{
+			img.removeAttr('width').removeAttr('height');
+			if(typeof(data.error) != 'undefined')
+			{
+				alert(data.error);
+				img.attr('src', img_path + default_img);
+			}else{
+				img.attr('src', img_path + data.file_name + '?' + Math.random());
+				$('#'+id).parents('li:first').attr("data-param","{'apid':'"+ data.file_id +"'}");
+			}
+		},
+		error: function (data, status, e)
+		{
+			alert(e);
+			img.attr('src', default_img);
+		}
+	});
+	img_handle();
+	$('#'+id).unbind().change(function(){
+		ajaxFileUpload(id);
+	});
+}
+</script>

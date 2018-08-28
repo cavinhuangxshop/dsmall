@@ -1,0 +1,165 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+
+<div class="alert mt10" style="clear:both;">
+    <ul class="mt5">
+        <li>1、符合以下任何一种条件的订单即为有效订单：1）采用在线支付方式支付并且已付款；2）采用货到付款方式支付并且交易已完成</li>
+        <li>2、以下关于订单和订单商品近30天统计数据的依据为：从昨天开始最近30天的有效订单</li>
+    </ul>
+</div>
+<div class="alert alert-info mt10" style="clear:both;">
+    <ul class="mt5">
+        <li>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单的总金额" class="tip fa fa-question-circle"></i>
+                近30天下单金额：<strong>{$statnew_arr.orderamount}{$Think.lang.currency_zh}</strong>
+            </span>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单的会员总数" class="tip fa fa-question-circle"></i>
+                近30天下单会员数：<strong>{$statnew_arr.ordermembernum}</strong>
+            </span>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单的总订单数" class="tip fa fa-question-circle"></i>
+                近30天下单量：<strong>{$statnew_arr.ordernum}</strong>
+            </span>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单的总商品数量" class="tip fa fa-question-circle"></i>
+                近30天下单商品数：<strong>{$statnew_arr.ordergoodsnum}</strong>
+            </span>
+        </li>
+        <li>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单的平均每个订单的交易金额" class="tip fa fa-question-circle"></i>
+                平均客单价：<strong>{$statnew_arr.avgorderamount}{$Think.lang.currency_zh}</strong>
+            </span>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单商品的平均每个商品的成交价格" class="tip fa fa-question-circle"></i>
+                平均价格：<strong>{$statnew_arr.avggoodsprice}{$Think.lang.currency_zh}</strong>
+            </span>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺所有商品的总收藏次数" class="tip fa fa-question-circle"></i>
+                商品收藏量：<strong>{$statnew_arr.gcollectnum}</strong>
+            </span>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺拥有商品的总数（仅计算商品种类，不统计库存）" class="tip fa fa-question-circle"></i>
+                商品总数：<strong>{$statnew_arr.goodsnum}</strong>
+            </span>
+        </li>
+        <li>
+            <span class="w200 fl h30" style="display:block;">
+                <i title="店铺总收藏次数" class="tip fa fa-question-circle"></i>
+                店铺收藏量：<strong>{$statnew_arr.store_collect}</strong>
+            </span>
+            <span class="w400 fl h30" style="display:block;">
+                <i title="店铺从昨天开始最近30天有效订单的下单频繁的时间点" class="tip fa fa-question-circle"></i>
+                下单高峰期：<strong>{$statnew_arr.hothour ?$statnew_arr.hothour :'暂无'}</strong>
+            </span>
+        </li>
+    </ul>
+    <div style="clear:both;"></div>
+</div>
+
+<div id="container"></div>
+
+<div class="w450 fl mr50">
+    <div class="alert alert-info" style="margin-bottom:0px;"><strong>建议推广商品</strong>
+        &nbsp;<i title="统计店铺从昨天开始7日内热销商品前30名，建议推广以下商品，提升推广回报率" class="tip fa fa-question-circle"></i>
+    </div>
+    <table class="dssc-default-table">
+        <thead>
+            <tr class="sortbar-array">
+                <th class="align-center">序号</th>
+                <th class="align-center">商品名称</th>
+                <th class="align-center">销量</th>
+            </tr>
+        </thead>
+        <tbody id="datatable">
+            {notempty name="goodstop30_arr"}
+            {foreach name="goodstop30_arr" item="v"}
+            <tr class="bd-line">
+                <td class="w50">{$key+1}</td>
+                <td class="tl">
+                    <span class="over_hidden w340 h20">
+                        <a href="{:url('Goods/index',['goods_id'=>$v.goods_id])}" target="_blank">{$v.goods_name}</a>
+                    </span>
+                </td>
+                <td class="w50">{$v.ordergoodsnum}</td>
+            </tr>
+            {/foreach}
+            {else /}
+            <tr>
+                <td colspan="20" class="norecord">
+                    <div class="warning-option">
+                        <i class="fa fa-warning"></i>
+                        <span>{$Think.lang.no_record}</span>
+                    </div>
+                </td>
+            </tr>
+            {/notempty}
+        </tbody>
+    </table>
+</div>
+<div class="w450 fl">
+    <div class="alert alert-info" style="margin-bottom:0px;">
+        <strong>同行热卖</strong>
+        &nbsp;<i title="拥有相同经营类目同行店铺热销商品推荐，了解行业热卖便于调整商品结构" class="tip fa fa-question-circle"></i>
+    </div>
+    <table class="dssc-default-table">
+        <thead>
+            <tr class="sortbar-array">
+                <th class="align-center">序号</th>
+                <th class="align-center">商品名称</th>
+                <th class="align-center">销量</th>
+            </tr>
+        </thead>
+        <tbody id="datatable">
+            {notempty name="othergoodstop30_arr" id="v"}
+            {foreach name="othergoodstop30_arr" item="v"}
+            <tr class="bd-line">
+                <td class="w50">{$key+1}</td>
+                <td class="tl">
+                    <span class="over_hidden w340 h20">
+                        <a href="{:url('Goods/index',['goods_id'=>$v.goods_id])}" target="_blank">{$v.goods_name}</a>
+                    </span>
+                </td>
+                <td class="w50">{$v.ordergoodsnum}</td>
+            </tr>
+            {/foreach}
+            {else /}
+            <tr>
+                <td colspan="20" class="norecord">
+                    <div class="warning-option">
+                        <i class="fa fa-warning"></i>
+                        <span>{$Think.lang.no_record}</span>
+                    </div>
+                </td>
+            </tr>
+            {/notempty}
+        </tbody>
+    </table>
+</div>
+<div class="h30 cb">&nbsp;</div>
+<script>
+    jQuery.browser={};(function(){jQuery.browser.msie=false; jQuery.browser.version=0;if(navigator.userAgent.match(/MSIE ([0-9]+)./)){ jQuery.browser.msie=true;jQuery.browser.version=RegExp.$1;}})();
+</script>
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.poshytip.min.js"></script>
+<script src="{$Think.PLUGINS_SITE_ROOT}/highcharts/highcharts.js"></script>
+<script>
+$(function(){
+    //Ajax提示
+    $('.tip').poshytip({
+        className: 'tip-yellowsimple',
+        showTimeout: 1,
+        alignTo: 'target',
+        alignX: 'center',
+        alignY: 'top',
+        offsetY: 5,
+        allowTipHover: false
+    });
+
+    $('#container').highcharts({$stattoday_json});
+});
+</script>
+
+{/block}

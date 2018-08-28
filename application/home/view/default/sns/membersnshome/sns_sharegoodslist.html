@@ -1,0 +1,111 @@
+{extend name="default/base/base_sns" /}
+{block name="sns_main"}
+
+
+<div class="sns-main-all">
+  <div class="tabmenu">
+      {if $relation==3}
+      <div class="release-banner">
+          <span class="sns-btn">
+              <a href="javascript:void(0);" id="snssharegoods">+ {$Think.lang.sns_share_treasure}</a>
+          </span>
+          {notempty name="goodslist"}
+          <i></i><h3>{$Think.lang.sns_release_banner_h3}</h3>
+          {/notempty}
+      </div>
+      {/if}
+    <ul class="tab">
+      <li class="active"><i></i><a href="{:url('Membersnshome/shareglist',['type'=>'share','mid'=>$master_info.member_id])}">{$Think.lang.sns_shareofgoods}</a></li>
+      <li class="normal"><i></i><a href="{:url('Membersnshome/shareglist',['type'=>'like','mid'=>$master_info.member_id])}">{$Think.lang.sns_likeofgoods}</a></li>
+    </ul>
+  </div>
+    
+    
+    
+  <div class="sharelist-g mt30">
+    {notempty name="goodslist"}
+    <ul class="ds-sns-pinterest" id="snsPinterest">
+      {foreach name="goodslist" item="v" key="k" }
+      <li id="recordone_{$v.sharegoods_id}" class="item">
+        <ul class="handle">
+            {if $relation==3}
+            <li class="buyer-show"><a href="javascript:void(0)" dstype="add_share" data-param="{'sid':'{$v.sharegoods_id}', 'gid':'{$v.sharegoods_goodsid}'}"><i></i>{$Think.lang.sns_buyershow}</a></li>
+            <li class="set" ds_type="privacydiv"><a href="javascript:void(0)" ds_type="formprivacybtn"><i></i>{$Think.lang.sns_setting}</a>
+                <ul class="set-menu" ds_type="privacytab" style="display:none;">
+                    <li ds_type="privacyoption" data-param='{"sid":"{$v.sharegoods_id}","v":"0"}'><span class="{if $v.sharegoods_privacy==0}selected{/if}">{$Think.lang.sns_open}</span></li>
+                    <li ds_type="privacyoption" data-param='{"sid":"{$v.sharegoods_id}","v":"1"}'><span class="{if $v.sharegoods_privacy==1}selected{/if}">{$Think.lang.sns_friend}</span></li>
+                    <li ds_type="privacyoption" data-param='{"sid":"{$v.sharegoods_id}","v":"2"}'><span class="{if $v.sharegoods_privacy==2}selected{/if}">{$Think.lang.sns_privacy}</span></li>
+                    <li ds_type="delbtn" data-param='{"sid":"{$v.sharegoods_id}","tabtype":"share"}'><span class="del"><a href="javascript:void(0);">{$Think.lang.ds_delete}</a></span></li>
+                </ul>
+            </li>
+            {/if}
+        </ul>
+        <dl>
+          <dt class="goodspic"><span class="thumb size233"><i></i><a href="{:url('Membersnshome/goodsinfo',['mid'=>$v.sharegoods_memberid,'id'=>$v.sharegoods_id])}" title="{$v.snsgoods_goodsname}"> <img src="{:goods_cthumb($v['snsgoods_goodsimage'],240,$v['snsgoods_storeid'])}"/></a></span>
+            {if isset($pic_list[$v['sharegoods_id']])}
+            <div class="ap-pic"><span class="num"><i></i>{$pic_list[$v['sharegoods_id']]['count']}</span><img src="{$pic_list[$v['sharegoods_id']]['ap_cover']}" /></div>
+            {/if}
+          </dt>
+          <dd class="pinterest-cmt">{$v.sharegoods_content}</dd>
+          <dd class="pinterest-addtime goods-time">{$Think.lang.sns_at}&nbsp;<?php echo @date('Y-m-d H:i',$v['sharegoods_addtime']);?>&nbsp;{$Think.lang.ds_snsshare}</dd>
+          <dd class="pinterest-ops"> 
+              <span class="ops-like" id="likestat_{$v.sharegoods_goodsid}">
+                  <a href="javascript:void(0);" ds_type="likebtn" data-param='{"gid":"{$v.sharegoods_goodsid}"}' class="{if isset($v.snsgoods_havelike) && $v.snsgoods_havelike==1}noaction{/if}"><i class="{if isset($v.snsgoods_havelike) && $v.snsgoods_havelike==1}noaction{/if} pngFix"></i>{$Think.lang.sns_like}</a>
+                  <em ds_type="likecount_{$v.sharegoods_goodsid}">{$v.snsgoods_likenum}</em>
+              </span>
+              <span class="ops-comment">
+                  <a href="{:url('Membersnshome/goodsinfo',['mid'=>$v.sharegoods_memberid,'id'=>$v.sharegoods_id])}" title="{$Think.lang.sns_comment}">
+                      <i class="pngFix"></i></a><em>{$v.sharegoods_commentcount}</em> 
+              </span>
+          </dd>
+          <div class="clear"></div>
+        </dl>
+      </li>
+      {/foreach}
+    </ul>
+    <div class="clear"></div>
+    <div class="pagination  mb30">{$show_page}</div>
+    <div class="clear"></div>
+    {else/}
+    {if $relation==3}
+    <div class="sns-norecord"><i class="goods-ico pngFix"></i>
+        <span>{$Think.lang.sns_sharegoods_nothave_self_1}
+            <a href="{:url('Memberorder/index')}" target="_blank">{$Think.lang.sns_sharegoods_nothave_self_2}</a>{$Think.lang.sns_sharegoods_nothave_self_3}
+            <a href="{:url('Memberfavorites/fglist')}" target="_blank">{$Think.lang.sns_sharegoods_nothave_self_4}</a>{$Think.lang.sns_sharegoods_nothave_self_5}
+        </span>
+    </div>
+    {else/}
+    <div class="sns-norecord"><i class="goods-ico pngFix"></i><span>{$Think.lang.sns_sharegoods_nothave}</span></div>
+    {/if}
+    {/notempty}
+  </div>
+  <div class="clear">&nbsp;</div>
+</div>
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.masonry.js" type="text/javascript"></script> 
+<script type="text/javascript">
+$(function(){
+	$("#snsPinterest").imagesLoaded( function(){
+		$("#snsPinterest").masonry({
+			itemSelector : '.item'
+		});
+	});
+    //显示分享商品页面
+	$('#snssharegoods').click(function(){
+	    ajax_form("sharegoods", '{$Think.lang.sns_share_purchasedgoods}', '{:url("membersnsindex/sharegoods")}', 480);
+	    return false;
+	});
+	// 追加
+	$('a[dstype="add_share"]').click(function(){
+	    eval( "data_str = "+$(this).attr('data-param'));
+		ajax_form('add_share', '{$Think.lang.sns_upload_treasure_buyer_show}', HOMESITEURL+'/Membersnshome/add_share.html?sid='+data_str.sid+'&gid='+data_str.gid, 580);
+	});
+	// 买家秀
+	$('a[dstype="add_pic"]').click(function(){
+		
+	});
+});
+</script> 
+
+
+
+{/block}

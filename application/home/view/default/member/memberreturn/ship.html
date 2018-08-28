@@ -1,0 +1,54 @@
+
+<form id="post_form" method="post" action="{:url('Memberreturn/ship',['return_id'=>$return.refund_id])}">
+  <h3>请填写退货发货信息</h3>
+  <dl>
+    <dt>物流公司{$Think.lang.ds_colon}</dt>
+    <dd>
+      <select name="express_id">
+        <option value="0">-请选择-</option>
+        {notempty name="express_list"}
+        {foreach name="express_list" item="val"  }
+        <option value="{$val.express_id}">{$val.express_name}</option>
+        {/foreach}
+        {/notempty}
+      </select>
+    </dd>
+  </dl>
+  <dl>
+    <dt><i class="required">*</i>物流单号{$Think.lang.ds_colon}</dt>
+    <dd>
+      <input type="text" class="text w150" name="invoice_no" value="" />
+      <p class="hint">发货 {$return_delay} 天后，当商家选择未收到则要进行延迟时间操作；
+        如果超过 {$return_confirm} 天不处理按弃货处理，直接由管理员确认退款。</p>
+    </dd>
+  </dl>
+  <div class="bottom">
+    <label class="submit-border">
+      <input type="submit" class="submit" id="confirm_button" value="{$Think.lang.ds_ok}" />
+    </label>
+      <a href="javascript:history.go(-1);" class="dsm-btn ml10"><i class="fa fa-reply"></i>返回列表</a>
+  </div>
+</form>
+<script type="text/javascript">
+$(function(){
+    $('#post_form').validate({
+        errorLabelContainer: $('#warning'),
+        invalidHandler: function(form, validator) {
+               $('#warning').show();
+        },
+		submitHandler:function(form){
+			ajaxpost('post_form', '', '', 'onerror')
+		},
+        rules : {
+            invoice_no : {
+                required   : true
+            }
+        },
+        messages : {
+            invoice_no  : {
+                required   : '请填写物流单号'
+            }
+        }
+    });
+});
+</script>

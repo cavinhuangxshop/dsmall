@@ -1,0 +1,100 @@
+{include file="default/base/mall_top" /} 
+<style>
+    .w1200{width:1000px;}
+</style>
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home_cart.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/mlselection.js"></script>
+<div class="dsc-header">
+    <div class="logo">
+        <a href="{$Think.HOME_SITE_URL}"><img src="{$Think.config.url_attach_common}/{$Think.config.site_logo}"/></a>
+    </div>
+    <ul class="dsc-flow">
+        <li class=""><i class="fa fa-shopping-cart"></i>
+            <p>我的购物车</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+        <li class="current"><i class="fa fa-pencil"></i>
+            <p>填写核对购物信息</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+        <li class=""><i class="fa fa-credit-card-alt"></i>
+            <p>支付提交</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+        <li class=""><i class="fa fa-thumbs-o-up"></i>
+            <p>订单完成</p>
+            <sub></sub>
+            <div class="hr"></div>
+        </li>
+    </ul>
+</div>
+
+
+
+
+<div class="dsc-main">
+  <div class="dsc-title">
+    <h3>{$Think.lang.cart_index_payment}</h3>
+    <h5>查看充值记录可以通过<a href="{:url('Predeposit/index')}" target="_blank">我的充值列表 </a>进行查看。</h5>
+  </div>
+  <form action="{:url('Payment/pd_order')}" method="POST" id="buy_form">
+    <input type="hidden" name="pdr_sn" value="{$pdr_info.pdr_sn}">
+    <input type="hidden" id="payment_code" name="payment_code" value="">
+    <div class="dsc-receipt-info">
+    <div>充值单号 : {$pdr_info.pdr_sn}</div>
+      <div class="dsc-receipt-info-title">
+        <h3>您已申请账户余额充值，请立即在线支付！
+          充值金额：<strong>￥{$pdr_info.pdr_amount}</strong> </h3>
+      </div>
+    </div>
+    <div class="dsc-receipt-info">
+        {notempty name="payment_list"}
+      <div class="dsc-receipt-info-title">
+        <h3>支付选择</h3>
+      </div>
+      <ul class="dsc-payment-list">
+          {foreach name="payment_list" item="val"}
+        <li payment_code="{$val.payment_code}">
+          <label for="pay_{$val.payment_code}">
+          <i></i>
+          <div class="logo" for="pay_{$val.payment_code}"> <img src="{$Think.HOME_SITE_ROOT}/images/payment/{$val.payment_code}_logo.gif" /> </div>
+          <div class="predeposit" ds_type="predeposit" style="display:none">
+              {if $val.payment_code == 'predeposit'}
+               {if $available_predeposit}
+                <p>当前预存款余额<br/>￥{$available_predeposit}<br/>不足以支付该订单<br/><a href="{:url('Predeposit/index')}">马上充值</a></p>
+               {else /}
+                <input type="password" class="text w120" name="password" maxlength="40" id="password" value="">
+                <p>使用站内预存款进行支付时，需输入您的登录密码进行安全验证。</p>
+               {/if}
+           {/if}
+          </div>
+          </label>
+        </li>
+       {/foreach}
+      </ul>
+     {/notempty}
+    </div>
+    <div class="dsc-bottom tc mb50">
+        <a href="javascript:void(0);" id="next_button" class="dsc-btn dsc-btn-green"><i class="fa fa-shield"></i>确认提交支付</a>
+    </div>
+  </form>
+</div>
+<script type="text/javascript">
+$(function(){
+    $('.dsc-payment-list > li').on('click',function(){
+    	$('.dsc-payment-list > li').removeClass('using');
+        $(this).addClass('using');
+        $('#payment_code').val($(this).attr('payment_code'));
+    });
+    $('#next_button').on('click',function(){
+        if ($('#payment_code').val() != '') {
+            $('#buy_form').submit();
+        }
+    });
+});
+</script>
+
+{include file="default/base/mall_footer" /}

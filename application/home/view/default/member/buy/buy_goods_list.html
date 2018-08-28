@@ -1,0 +1,195 @@
+<style>
+.dsc-table-style tbody tr.item_disabled td{background: none repeat scroll 0 0 #F9F9F9;height: 30px;padding: 10px 0;text-align: center;}
+</style>
+<div class="dsc-receipt-info">
+  <div class="dsc-receipt-info-title">
+    <h3>商品清单</h3>
+    {notempty name="ifcart"}
+    <a href="{:url('Cart/index')}">返回购物车</a>
+    {/notempty}
+  </div>
+  <table class="dsc-table-style">
+    <thead>
+      <tr>
+        <th class="w20"></th>
+        <th></th>
+        <th>商品</th>
+        <th class="w120">单价(元)</th>
+        <th class="w120">数量</th>
+        <th class="w120">小计(元)</th>
+      </tr>
+    </thead>
+    <?php foreach($store_cart_list as $store_id => $cart_list) {?>
+    <tbody>
+      <tr>
+        <th colspan="6"><strong>店铺：<a href="{:url('Store/index',['store_id'=>$store_id])}">{$cart_list[0]['store_name']}</a></strong><span member_id="{$store_list[$store_id]['member_id']}"></span>
+          <div class="store-sale">
+            {if !empty($cancel_calc_sid_list[$store_id])}
+            <em><i class="fa fa-gift"></i>店铺活动-免运费</em>{$cancel_calc_sid_list[$store_id]['desc']}
+            {/if}
+            {if !empty($store_mansong_rule_list[$store_id])}
+            <em><i class="fa fa-gift"></i>店铺活动-满即送</em>{$store_mansong_rule_list[$store_id]['desc']}
+            {if isset($store_premiums_list[$store_id])}
+            <?php foreach ($store_premiums_list[$store_id] as $goods_info) { ?>
+            <a href="{:url('Goods/index',['goods_id'=>$goods_info.goods_id])}" target="_blank" class="dsc-store-gift" title="{$goods_info.goods_name}"><img src="{:goods_thumb($goods_info,240)}" alt="{$goods_info.goods_name}" /></a>
+            <?php } ?>
+            {/if}
+            {/if}
+          </div></th>
+      </tr>
+      <?php foreach($cart_list as $cart_info) {?>
+      <tr id="cart_item_{$cart_info.cart_id}" class="shop-list {if $cart_info.state && $cart_info.storage_state}{else/}item_disabled{/if}">
+          <td>
+              {if $cart_info['state'] && $cart_info['storage_state']}
+              <input type="hidden" value="{$cart_info.cart_id}|{$cart_info.goods_num}" name="cart_id[]">
+              {/if}
+          </td>
+          {if $cart_info['bl_id'] == '0'}
+          <td class="w60"><a href="{:url('Goods/index',['goods_id'=>$cart_info.goods_id])}" target="_blank" class="dsc-goods-thumb"><img src="{:goods_thumb($cart_info,240)}" alt="{$cart_info.goods_name}" /></a></td>
+          {/if}
+        <td class="tl" {if $cart_info.bl_id != '0'}colspan="2"{/if}><dl class="dsc-goods-info">
+            <dt><a href="{:url('Goods/index',['goods_id'=>$cart_info.goods_id])}" target="_blank">{$cart_info.goods_name}</a></dt>
+            {notempty name="$cart_info.xianshi_info"}
+            <dd> <span class="xianshi">满<strong>{$cart_info.xianshi_info.xianshigoods_lower_limit}</strong>件，单价直降<em>￥{$cart_info.xianshi_info.down_price}</em></span> </dd>
+            {/notempty}
+            {if isset($cart_info['ifgroupbuy'])}
+            <dd> <span class="groupbuy">抢购</span></dd>
+            {/if}
+            {if $cart_info['bl_id'] != '0'}
+            <dd> <span class="buldling">优惠套装，单套直降<em>￥{$cart_info.down_price}</em></span></dd>
+            {/if}
+            {notempty name="$cart_info.gift_list"}
+            <dd><span class="dsc-goods-gift">赠</span>
+              <ul class="dsc-goods-gift-list">
+                {foreach name="$cart_info.gift_list" item="goods_info"  }
+                <li ds_group="{$cart_info.cart_id}"><a href="{:url('Goods/index',['goods_id'=>$goods_info.gift_goodsid])}" target="_blank" class="thumb" ><img src="{:goods_cthumb($goods_info['gift_goodsimage'],240,$store_id)}" alt="{$goods_info.gift_goodsname}"/></a> </li>
+                {/foreach}
+              </ul>
+            </dd>
+            {/notempty}
+          </dl></td>
+        <td class="w120"><em>{$cart_info.goods_price}</em></td>
+        <td class="w60">{if $cart_info.state}{$cart_info.goods_num}{/if}</td>
+        <td class="w120">
+          {if $cart_info['state'] && $cart_info['storage_state']}
+          <em id="item{$cart_info.cart_id}_subtotal" ds_type="eachGoodsTotal">{$cart_info.goods_total}</em>
+          {elseif !$cart_info['storage_state'] /}
+          <span style="color: #F00;">库存不足</span>
+          {elseif !$cart_info['state'] /}
+          <span style="color: #F00;">已下架</span>
+          {/if}
+        </td>
+      </tr>
+
+      <!-- S bundling goods list -->
+      {notempty name="$cart_info.bl_goods_list"}
+      {foreach name="$cart_info.bl_goods_list" item="goods_info"  }
+      <tr class="shop-list {if $cart_info.state && $cart_info.storage_state}{else/}item_disabled{/if}">
+        <td></td>
+        <td class="w60"><a href="{:url('Goods/index',['goods_id'=>$goods_info.goods_id])}" target="_blank" class="dsc-goods-thumb"><img src="{:goods_thumb($goods_info,240)}" alt="{$goods_info.goods_name}" /></a></td>
+        <td class="tl"><dl class="dsc-goods-info">
+            <dt><a href="{:url('Goods/index',['goods_id'=>$goods_info.goods_id])}" target="_blank">{$goods_info.goods_name}</a> </dt>
+          </dl>
+        </td>
+        <td><em>{$goods_info.blgoods_price}</em></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {/foreach}
+      {/notempty}
+      <!-- E bundling goods list -->
+
+      <?php } ?>
+      <tr>
+        <td class="w10"></td>
+        <td class="tl" colspan="2">买家留言：
+          <textarea  name="pay_message[{$store_id}]" class="dsc-msg-textarea" placeholder="选填：对本次交易的说明（建议填写已经和商家达成一致的说明）" title="选填：对本次交易的说明（建议填写已经和商家达成一致的说明）"  maxlength="150"></textarea></td>
+        <td class="tl" colspan="3"><div class="dsc-form-default"> </div></td>
+      </tr>
+      <tr>
+        <td class="tr" colspan="6"><div class="dsc-store-account">
+            <dl class="freight">
+              <dt>运费：</dt>
+              <dd><em id="eachStoreFreight_{$store_id}">0.00</em>元</dd>
+            </dl>
+            <dl>
+              <dt>商品金额：</dt>
+              <dd><em id="eachStoreGoodsTotal_{$store_id}">{$store_goods_total[$store_id]}</em>元</dd>
+            </dl>
+                {if !empty($store_mansong_rule_list[$store_id]['discount'])}
+                <dl class="mansong">
+                    <dt>满即送-{$store_mansong_rule_list[$store_id]['desc']}：</dt>
+                    <dd><em id="eachStoreManSong_{$store_id}">-{$store_mansong_rule_list[$store_id]['discount']}</em>元</dd>
+                </dl>
+                {/if}
+
+            <!-- S voucher list -->
+            {notempty name="$store_voucher_list[$store_id]"}
+            <dl class="voucher">
+              <dt>
+                <select dstype="voucher" name="voucher[{$store_id}]">
+                  <option value="{$voucher.vouchertemplate_id|default=''}|{$store_id}|0.00">选择代金券</option>
+                  {foreach name="$store_voucher_list[$store_id]" item="voucher" }
+                  <option value="{$voucher.vouchertemplate_id}|{$store_id}|{$voucher.voucher_price}">{$voucher.desc}</option>
+                  {/foreach}
+                </select>：
+              </dt>
+              <dd><em id="eachStoreVoucher_{$store_id}">-0.00</em>元</dd>
+            </dl>
+            {/notempty}
+
+            <!-- E voucher list -->
+
+            <dl class="total">
+              <dt>本店合计：</dt>
+              <dd><em store_id="{$store_id}" ds_type="eachStoreTotal"></em>元</dd>
+            </dl>
+          </div></td>
+      </tr>
+      <?php }?>
+
+      <!-- S 预存款 & 充值卡 -->
+      {if !empty($available_pd_amount) || !empty($available_rcb_amount)}
+      <tr id="pd_panel">
+          <td class="pd-account" colspan="6"><div class="dsc-pd-account">
+                  {notempty name="available_rcb_amount"}
+                  <div class="mt5 mb5">
+                      <label>
+                          <input type="checkbox" class="vm mr5" value="1" name="rcb_pay">
+                          使用充值卡（可用金额：<em>{$available_rcb_amount}</em>元
+                      </label>
+                  </div>
+                  {/notempty}
+                  {notempty name="available_pd_amount"}
+                  <div class="mt5 mb5">
+                      <label>
+                          <input type="checkbox" class="vm mr5" value="1" name="pd_pay">
+                          使用预存款（可用金额：<em>{$available_pd_amount}</em>元）</label>
+                  </div>
+                  {/notempty}
+                  {if !empty($available_pd_amount) && !empty($available_rcb_amount)}
+                  <div class="mt5 mb5">如果二者同时使用，系统优先使用充值卡&nbsp;&nbsp;</div>
+                  {/if}
+                  <div id="pd_password" style="display: none">支付密码：
+                      <input type="password" class="text w120" value="" name="password" id="pay-password" maxlength="35" autocomplete="off">
+                      <input type="hidden" value="" name="password_callback" id="password_callback">
+                      <a class="dsc-btn-mini dsc-btn-orange" id="pd_pay_submit" href="javascript:void(0)">使用</a>
+                      {if !$member_paypwd}
+                      还未设置支付密码，<a href="{:url('Membersecurity/auth',['type'=>'modify_paypwd'])}" target="_blank">马上设置</a>
+                      {/if}
+                  </div>
+              </div>
+          </td>
+      </tr>
+      {/if}
+      <!-- E 预存款 -->
+
+
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="6"><div class="dsc-all-account">订单总金额：<em id="orderTotal"></em>元</div></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
